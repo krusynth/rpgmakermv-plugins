@@ -6,8 +6,8 @@
  * @author Krues8dr (krues8dr.com)
  *
  * @help
- * By default, RPG Maker MV doesn't allow airships to interact with
- * events – this plugin removes that limitation.
+ * By default, RPG Maker MV doesn't allow airships to interact with events.
+ * This plugin removes that limitation, allowing airships to land in towns, etc.
  *
  * Note that you'll have to create special handling for dealing with
  * transfers (e.g. entering towns, etc.) for airships to use this as

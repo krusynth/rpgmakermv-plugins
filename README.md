@@ -12,8 +12,8 @@ Automatically clears all previously loaded photos whenever a map is loaded. This
 makes it easier to have parallax photos on your maps as they'll automatically be cleaned up for you.
 
 ## [Airship Events](Kru_AirshipEvents.js)
-By default, RPG Maker MV doesn't allow airships to interact with events. This
-plugin removes that limitation.
+By default, RPG Maker MV doesn't allow airships to interact with events.
+This plugin removes that limitation, allowing airships to land in towns, etc.
 
 ## [Vehicle Insides](Kru_VehicleInsides.js)
 This plugin allows you to easily create maps for the insides of vehicles, like
