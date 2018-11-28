@@ -66,11 +66,18 @@ Kru.helpers.getFileData = function(src) {
 // Parse tags into an object
 Kru.helpers.parseNoteTags = function(note) {
   if(typeof(note) == 'string') {
+    var data = {};
+
     // If we have JSON, use that.
-    try {
-      var data = JSON.parse(note);
+    var notes = note.split(/\r?\n/);
+    for(pNT = 0; pNT < notes.length; pNT++) {
+      try {
+        Object.assign(data, JSON.parse(notes[pNT]));
+      } catch(e) {};
+    }
+    if(data !== {}) {
       return data;
-    } catch(e) {};
+    }
 
     // Otherwise we have to parse some tags.
     var regex = /<([A-Za-z0-9-_]+) ?(.*?)>/g;
@@ -116,6 +123,33 @@ Kru.helpers.normalizeValues = function(value) {
   return value;
 };
 
+// Parse notes
+
+Kru.helpers.processNotes = function(type) {
+  if(type === 'skills') {
+    // Only process once.
+    if(typeof($dataSkills._kru_processed) === 'undefined') {
+      for(i = 0; i < $dataSkills.length; i++) {
+        if($dataSkills[i]) {
+          $dataSkills[i]._notes = Kru.helpers.parseNoteTags($dataSkills[i].note);
+        }
+      }
+      $dataSkills._kru_processed = true;
+    }
+  }
+  else if(type === 'classes') {
+    // Only process once.
+    if(typeof($dataClasses._kru_processed) === 'undefined') {
+      for(i = 0; i < $dataClasses.length; i++) {
+        if($dataClasses[i]) {
+          $dataClasses[i]._notes = Kru.helpers.parseNoteTags($dataClasses[i].note);
+        }
+      }
+      $dataClasses._kru_processed = true;
+    }
+  }
+};
+
 
 /*
  * Kru WindowManager – the easy way to manage scene windows.
@@ -148,6 +182,7 @@ Kru.helpers.WindowManager = function (scene) {
       }
     }
 
+    win.scene = this.scene;
     win.actor = this.scene.actor();
 
     if(Kru.helpers.windowHandlers[win.type]) {
@@ -392,7 +427,9 @@ Kru_CustomListWindow.prototype.initialize = function(win) {
   this.iconWidth = 42; // this._iconWidth is too short?
   this.fontWidth = 14;
 
+  // Set event handlers.
   this.setHandler('ok', this.onOk.bind(this));
+  this.setHandler('cancel', this.onCancel.bind(this));
 
   this.refresh();
 };
@@ -400,6 +437,10 @@ Kru_CustomListWindow.prototype.initialize = function(win) {
 Kru_CustomListWindow.prototype.onOk = function() {
   this.refresh();
   this.activate();
+};
+
+Kru_CustomListWindow.prototype.onCancel = function() {
+  this._win.scene.popScene();
 };
 
 Kru_CustomListWindow.prototype.failState = function() {
@@ -411,9 +452,14 @@ Kru_CustomListWindow.prototype.refresh = function() {
   if (this.contents) {
     this.contents.clear();
   }
+  this.drawHeader();
   this.drawAllLines();
   this.drawAllItems();
+  this.drawFooter();
 };
+
+Kru_CustomListWindow.prototype.drawTitle = function() {};
+Kru_CustomListWindow.prototype.drawFooter = function() {};
 
 Kru_CustomListWindow.prototype.drawAllLines = function() {
   if(this.lines && this.lines.length > 0) {
@@ -434,8 +480,12 @@ Kru_CustomListWindow.prototype.drawLine = function(line) {
     width = line.width;
   }
 
-  this.contents.kDrawLine(line.location[0], line.location[1],
-    line.location[2], line.location[3], color, width);
+  this.contents.kDrawLine(
+    Math.ceil(line.location[0]),
+    Math.ceil(line.location[1]),
+    Math.ceil(line.location[2]),
+    Math.ceil(line.location[3]),
+    color, width);
 };
 
 Kru_CustomListWindow.prototype.drawItem = function(index) {
@@ -478,9 +528,10 @@ Kru_CustomListWindow.prototype.updateCursor = function() {
     this.setTopRow(0);
   } else if (this.isCursorVisible()) {
     var rect = this.itemRect(this.index());
-
-    this.setCursorRect(
-      rect.x - rect.margin, rect.y - rect.margin, rect.width, rect.height);
+    if(rect) {
+      this.setCursorRect(
+        rect.x - rect.margin, rect.y - rect.margin, rect.width, rect.height);
+    }
   } else {
     this.setCursorRect(0, 0, 0, 0);
   }
@@ -489,6 +540,10 @@ Kru_CustomListWindow.prototype.updateCursor = function() {
 // Reimplement the navigation commands for the tree.
 Kru_CustomListWindow.prototype.itemRect = function(index) {
     var rect = new Rectangle();
+    if(typeof(this._data) === 'undefined' ||
+      typeof(this._data[index]) === 'undefined') {
+      return;
+    }
     var content = this._data[index];
 
     rect.x = content.location[0];
@@ -585,8 +640,46 @@ Bitmap.prototype.kDrawLine = function(x1, y1, x2, y2, color, width) {
     this._setDirty();
 };
 
+Bitmap.prototype.kDrawPolygon = function(points, line, fill) {
+  var context = this._context;
+  context.save();
+
+  if(typeof(line.width) != 'undefined') {
+    context.lineWidth = line.width;
+  }
+  if(typeof(line.color) != 'undefined') {
+    context.strokeStyle = line.color;
+  }
+  if(typeof(fill.color) != 'undefined') {
+    context.fillStyle = fill.color;
+  }
+  if(typeof(fill.alpha) != 'undefined') {
+    context.globalAlpha = fill.alpha;
+  }
+  context.beginPath();
+
+  context.moveTo(points[0][0], points[0][1]);
+
+  for(i = 1; i < points.length; i++) {
+    context.lineTo(points[i][0], points[i][1]);
+  }
+
+
+  context.closePath();
+
+  if(typeof(fill) != 'undefined') {
+    context.fill();
+  }
+
+  context.globalAlpha = 1;
+}
+
+
 // Function to debug any sounds when we don't want to run sounds.
 // Usage: open the console and run DebugSound();
+
+// TODO: Add AudioManager, etc.
+
 DebugSound = function() {
   this.playSystemSound = function() {
     console.log('SoundManager.splaySystemSound');

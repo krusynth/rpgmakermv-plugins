@@ -10,14 +10,14 @@ The following plugins are available in this repo:
 ## [Clear Map Photos](Kru_ClearMapPhotos.js)
 Automatically clears all previously loaded photos whenever a map is loaded. This
 makes it easier to have parallax photos on your maps as they'll automatically be
-cleaned up for you.
+cleaned up.
 
 ## [Airship Events](Kru_AirshipEvents.js)
 By default, RPG Maker MV doesn't allow airships to interact with events.
 This plugin removes that limitation, allowing airships to land in towns, etc.
 
 ## [Vehicle Insides](Kru_VehicleInsides.js)
-This plugin allows you to easily create maps for the insides of vehicles, like
+This plugin allows authors to easily create maps for the insides of vehicles, like
 the Big Whale in Final Fantasy IV or the airships in Final Fantasy VI. The
 player will automatically be transported to the map upon entering the vehicle.
 
@@ -25,6 +25,12 @@ player will automatically be transported to the map upon entering the vehicle.
 This plugin allows for events that are bigger than one tiles, by expanding the
 collision box via notes. This works nicely for larger sprites (like giant
 monsters) that can still wander around like normal events.
+
+## [Map Merge](Kru_MapMerge.js)
+Allows authors to merge maps together, replacing a section of a map with a new
+map based on a given set of conditions. This is useful for dynamic events where
+a part of the map changes dramatically - e.g., a building is destroyed or lots
+of new characters appear.
 
 ## [Kru Core](Kru_Core.js)
 Core library for many of the other plugins so as to not repeatedly re-implement
