@@ -65,7 +65,10 @@ Game_Event.prototype.initialize = function(mapId, eventId) {
 };
 
 Game_Event.prototype.Kru_handleSizing = function(event) {
-  if(event.meta.size !== undefined) {
+  if(
+    typeof(event.meta) !== 'undefined' &&
+    typeof(event.meta.size) !== 'undefined'
+  ) {
     var size = Kru.helpers.objectify(event.meta.size);
 
     if(size.w) {
