@@ -42,9 +42,19 @@ if(!Imported.Kru_Core) {
   throw new Error('Kru_StatOverhaul requires Kru_Core.');
 }
 
-Kru.MapMerge.Game_Map_setup = Game_Map.prototype.setup;
-Game_Map.prototype.setup = function() {
-  let notes = Kru.helpers.parseNoteTags($dataMap.note);
+Kru.MapMerge.DataManager_loadMapData = DataManager.loadMapData;
+DataManager.loadMapData = function(mapId) {
+  if (mapId > 0) {
+    $dataMap = Kru.helpers.getMapData(mapId, Kru.MapMerge.processMap);
+
+    Kru.MapMerge.processMap($dataMap);
+  } else {
+    this.makeEmptyMap();
+  }
+}
+
+Kru.MapMerge.processMap = function(parentMap) {
+  let notes = Kru.helpers.parseNoteTags(parentMap.note);
 
   if(typeof(notes.mapmerge) !== 'undefined') {
     for(gms_i = 0; gms_i < notes.mapmerge.length; gms_i++) {
@@ -61,13 +71,11 @@ Game_Map.prototype.setup = function() {
           offset = map.offset;
         }
 
-        Kru.MapMerge.mapMergeTiles($dataMap, mapData, offset);
-        Kru.MapMerge.mapMergeEvents($dataMap, mapData, offset);
+        Kru.MapMerge.mapMergeTiles(parentMap, mapData, offset);
+        Kru.MapMerge.mapMergeEvents(parentMap, mapData, offset);
       }
     }
   }
-
-  Kru.MapMerge.Game_Map_setup.call(this);
 };
 
 Kru.MapMerge.mapMergeTiles = function(map1, map2, offset) {
@@ -127,3 +135,14 @@ Kru.MapMerge.mapMergeEvents = function(map1, map2, offset) {
   }
 }
 
+// Remove extra map load when the map hasn't changed on scene load.
+// This fixes the issue where exiting the menu resets the map.
+Kru.MapMerge.Scene_Map_create = Scene_Map.prototype.create;
+Scene_Map.prototype.create = function() {
+    Scene_Base.prototype.create.call(this);
+    this._transfer = $gamePlayer.isTransferring();
+    // Here's what we're changing.
+    if(this._transfer) {
+      DataManager.loadMapData($gamePlayer.newMapId());
+    }
+};

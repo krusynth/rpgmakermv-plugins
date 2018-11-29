@@ -35,14 +35,14 @@ if(!Kru.helpers) {
   Kru.helpers = {};
 }
 
-Kru.helpers.getMapData = function(mapId) {
+Kru.helpers.getMapData = function(mapId, callback) {
   var filename = 'Map%1.json'.format(mapId.padZero(3));
-  return this.getFileData(filename);
+  return this.getFileData(filename, callback);
 };
 
 // Gets data from a JSON file.
 // Unlike the original version, this is synchronous and returns the result.
-Kru.helpers.getFileData = function(src) {
+Kru.helpers.getFileData = function(src, callback) {
   var data;
 
   var xhr = new XMLHttpRequest();
@@ -51,12 +51,16 @@ Kru.helpers.getFileData = function(src) {
   xhr.overrideMimeType('application/json');
   xhr.onload = function() {
     if (xhr.status < 400) {
-        data = JSON.parse(xhr.responseText);
-        DataManager.extractMetadata(data);
+      data = JSON.parse(xhr.responseText);
+      DataManager.extractMetadata(data);
+
+      if(typeof(callback) !== 'undefined') {
+        callback(data);
+      }
     }
   };
   xhr.onerror = function() {
-      DataManager._errorUrl = DataManager._errorUrl || url;
+    DataManager._errorUrl = DataManager._errorUrl || url;
   };
   xhr.send();
 
