@@ -30,6 +30,7 @@
  * TODO:
  *  Properly add skills for use in battle.
  *  Add support for items that add bonuses to skills.
+ *  Fix sounds on class change.
  */
 
 var Imported = Imported || {};
@@ -57,21 +58,9 @@ if(!Imported.Kru_Core) {
 Kru.ST.DataManager_isDatabaseLoaded = DataManager.isDatabaseLoaded;
 DataManager.isDatabaseLoaded = function() {
   Kru.ST.DataManager_isDatabaseLoaded.call(this);
-  Kru.ST.processNotes();
+  Kru.helpers.processNotes('skills');
+  Kru.helpers.processNotes('classes');
   return true;
-};
-
-Kru.ST.processNotes = function() {
-  for(i = 0; i < $dataSkills.length; i++) {
-    if($dataSkills[i]) {
-      $dataSkills[i]._notes = Kru.helpers.parseNoteTags($dataSkills[i].note);
-    }
-  }
-  for(i = 0; i < $dataClasses.length; i++) {
-    if($dataClasses[i]) {
-      $dataClasses[i]._notes = Kru.helpers.parseNoteTags($dataClasses[i].note);
-    }
-  }
 };
 
 // Setup
@@ -138,11 +127,13 @@ Kru_TreeWindow.prototype.initialize = function(win) {
 
   this.lines = classData._notes.lines;
   var skills = classData._notes.skills;
-  for(i_i = 0; i_i < skills.length; i_i++) {
-    skills[i_i] = Object.assign(skills[i_i], $dataSkills[skills[i_i].id]);
-    skills[i_i]._name = skills[i_i].name;
-    skills[i_i]._description = skills[i_i].description;
-    skills[i_i] = this.updateSkill(skills[i_i]);
+  if(typeof(skills) != 'undefined') {
+    for(i_i = 0; i_i < skills.length; i_i++) {
+      skills[i_i] = Object.assign(skills[i_i], $dataSkills[skills[i_i].id]);
+      skills[i_i]._name = skills[i_i].name;
+      skills[i_i]._description = skills[i_i].description;
+      skills[i_i] = this.updateSkill(skills[i_i]);
+    }
   }
   this._data = skills;
 
@@ -261,16 +252,6 @@ Kru_TreeWindow.prototype.skillAvailable = function(actor, skill) {
   return true;
 };
 
-Kru_TreeWindow.prototype.refresh = function() {
-  if (this.contents) {
-    this.contents.clear();
-  }
-  this.drawClassName();
-  this.drawAllLines();
-  this.drawAllItems();
-  this.drawUnusedPoints();
-};
-
 Kru_TreeWindow.prototype.redrawItem = function(index) {
   // TODO: Make this more efficient. At the moment, we don't know where lines
   // have been drawn, so we can't just clear a rectangle.
@@ -279,14 +260,14 @@ Kru_TreeWindow.prototype.redrawItem = function(index) {
   this.select(index);
 };
 
-Kru_TreeWindow.prototype.drawClassName = function() {
+Kru_TreeWindow.prototype.drawHeader = function() {
   var content = $dataClasses[this.actor._classId].name;
 
   // Arbitrarily set this in the top left corner.
   this.contents.drawText(content, 0, 10, 250, 10, 'left');
 };
 
-Kru_TreeWindow.prototype.drawUnusedPoints = function() {
+Kru_TreeWindow.prototype.drawFooter = function() {
   var content = String(this.actor._skillPoints) + ' Pts';
   // Arbitrarily set this in the bottom right corner.
   this.contents.drawText(content, 670, 415, 100, 10, 'right');
@@ -332,10 +313,6 @@ Scene_SkillChoice.prototype.create = function() {
   });
 
   treeWin.window.activate();
-
-  treeWin.window.setHandler('cancel', function() {
-    this.popScene();
-  }.bind(this));
 
   // Bottom Window: skill details.
   var infoWindow = this.wm.addWindow({

@@ -53,3 +53,10 @@ skills. Skills can also have multiple levels. *Requires Kru Core.*
 Adds Stat Points (optionally awarded on level up) that can be used to improve
 attributes (Attack, Defense, Luck, etc.).  Traditional class-based level up stat
 points can also be disabled entirely. *Requires Kru Core.*
+
+## [Class Change](Kru_ClassChange.js)
+*work in progress*
+
+Automatically triggers class change when certain conditions are met. Currently
+only checks on level up or when assinging stats with the Assign Stats plugin.
+*Requires Kru Core.*
