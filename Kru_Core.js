@@ -69,7 +69,7 @@ Kru.helpers.getFileData = function(src, callback) {
 
 // Parse tags into an object
 Kru.helpers.parseNoteTags = function(note) {
-  if(typeof(note) == 'string') {
+  if(typeof(note) == 'string' && note.length > 0) {
     var data = {};
 
     // If we have JSON, use that.
@@ -79,7 +79,7 @@ Kru.helpers.parseNoteTags = function(note) {
         Object.assign(data, JSON.parse(notes[pNT]));
       } catch(e) {};
     }
-    if(data !== {}) {
+    if(Object.keys(data).length > 0) {
       return data;
     }
 
@@ -118,6 +118,7 @@ Kru.helpers.parseNoteTags = function(note) {
     }
     return result;
   }
+  else return {};
 };
 
 Kru.helpers.normalizeValues = function(value) {
@@ -232,6 +233,7 @@ var Kru_WindowMixin = function() {
   this._iconSet = 'IconSet';
   this._iconWidth = Window_Base._iconWidth;
   this._iconHeight = Window_Base._iconHeight;
+  this._lineHeight = 36;
 
   this.iconInit = function(win) {
     if(win.icon) {
@@ -244,6 +246,9 @@ var Kru_WindowMixin = function() {
       if(win.icon.set) {
         this._iconSet = win.icon.set;
       }
+    }
+    if(typeof win.lineHeight !== 'undefined') {
+      this._lineHeight = win.lineHeight;
     }
   };
 
@@ -259,21 +264,27 @@ var Kru_WindowMixin = function() {
       this.loadIcons(set);
     }
 
+    let cols = Math.round(this.bitmap.width / this._iconWidth);
+
     var pw = this._iconWidth;
     var ph = this._iconHeight;
-    var sx = iconIndex % 16 * pw;
-    var sy = Math.floor(iconIndex / 16) * ph;
+    var sx = iconIndex % cols * pw;
+    var sy = Math.floor(iconIndex / cols) * ph;
     this.contents.blt(this.bitmap, sx, sy, pw, ph, x, y);
   };
 
   this.drawItemName = function(item, x, y, width) {
     width = width || 312;
     if (item) {
-        var iconBoxWidth = Window_Base._iconWidth + 4;
+        var iconBoxWidth = this._iconWidth + 4;
         this.resetTextColor();
         this.drawIcon(item.iconIndex, x + 2, y + 2);
         this.drawText(item.name, x + iconBoxWidth, y, width - iconBoxWidth);
     }
+  };
+
+  this.lineHeight = function() {
+    return this._lineHeight;
   };
 
   return this;

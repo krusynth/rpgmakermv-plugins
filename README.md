@@ -41,6 +41,13 @@ streamlined window APIs, line drawing tools, and note tag parsers.
 Shows more characters in the status window based on Max Battle Members setting
 in Yanfly's Party System.  *Requires Yanfly Party System.*
 
+## [Reputation](Kru_Reputation.js)
+A system for keeping track of the reputation of your party across multiple
+groups or factions. Allows you to have named values for different reputation
+values (e.g. "Known", "Famous", etc.). Works with builtin variables for ease of
+use. Also allows discounts at shops based on your reputation. You can even have
+special graphics for each group or faction. *Requires Kru Core.*
+
 ## [Skill Tree](Kru_SkillTree.js)
 *work in progress*
 
