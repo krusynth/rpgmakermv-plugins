@@ -35,19 +35,9 @@ Kru.MT = {
   config: {}
 };
 
-if(!Kru.helpers) {
-  Kru.helpers = {}
-}
-
-// Helper method to parse arguments from note/meta strings.
-Kru.helpers.objectify = function(text) {
-  var obj = {};
-  var arr = text.trim().split(' ');
-  for(i = 0; i < arr.length; i++) {
-    var tmp = arr[i].split('=');
-    obj[tmp[0]] = tmp[1];
-  }
-  return obj;
+if(!Imported.Kru_Core) {
+  alert('Kru_MultitileEvents requires Kru_Core.');
+  throw new Error('Kru_MultitileEvents requires Kru_Core.');
 }
 
 Game_CharacterBase.prototype._w = 0;
@@ -59,6 +49,8 @@ Game_Event.prototype.initialize = function(mapId, eventId) {
     this._mapId = mapId;
     this._eventId = eventId;
     var event = this.event();
+    event.meta = Kru.helpers.parseNoteTags(event.note);
+
     this.Kru_handleSizing(event);
     this.locate(event.x, event.y);
     this.refresh();
@@ -69,7 +61,7 @@ Game_Event.prototype.Kru_handleSizing = function(event) {
     typeof(event.meta) !== 'undefined' &&
     typeof(event.meta.size) !== 'undefined'
   ) {
-    var size = Kru.helpers.objectify(event.meta.size);
+    var size = event.meta.size;
 
     if(size.w) {
       var tmp_w = size.w.split(',');
@@ -120,7 +112,7 @@ Game_Event.prototype.canPass = function(init_x, init_y, d) {
   for(var x = init_x + this._w[0]; x <= init_x + this._w[1]; x++) {
     for(var y = init_y + this._h[0]; y <= init_y + this._h[1]; y++) {
       if(!this.canPassOrig(x, y, d)) {
-        console.log('cant pass', init_x, init_y, this._w, this._h, x, y, d);
+        // console.log('cant pass', init_x, init_y, this._w, this._h, x, y, d);
         return false;
       }
     }

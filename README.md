@@ -24,7 +24,7 @@ player will automatically be transported to the map upon entering the vehicle.
 ## [Multi-tile Events](Kru_MultitileEvents.js)
 This plugin allows for events that are bigger than one tiles, by expanding the
 collision box via notes. This works nicely for larger sprites (like giant
-monsters) that can still wander around like normal events.
+monsters) that can still wander around like normal events. *Requires Kru Core.*
 
 ## [Map Merge](Kru_MapMerge.js)
 Allows authors to merge maps together, replacing a section of a map with a new
