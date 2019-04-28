@@ -36,7 +36,7 @@
  *
  * @param Reputation Levels
  * @desc Names for different reputation levels.
- * @default Despised:-100, Hated:-50, Unknown:0, Familiar:50, Known:100,
+ * @default Despised:-100, Hated:-50, Unknown:0, Familiar:50, Known:100
  *
  * @param Show Unknown Factions
  * @desc Show factions that haven't been discovered yet on the menu?
@@ -56,8 +56,22 @@
  * @desc Size of the icons to use.
  * @default 16
  *
+ * @param Custom Icons
+ * @parent Icons
+ * @desc By default, the icons will be determined by their order in the variables. This option allows you to override the default.
+ * @type struct<CustomIcon>[]
+ *
  * Terms & Conditions
  * This plugin is free for non-commercial and commercial use.
+ */
+
+/*~struct~CustomIcon:
+ * @param Faction
+ * @type variable
+ *
+ * @param Icon
+ * @desc The index of the icon in the icon file. 0 is the first icon, etc.
+ * @type number
  */
 
 /*
@@ -160,6 +174,10 @@ if(!Imported.Kru_Core) {
 Kru.RP.DataManager_isDatabaseLoaded = DataManager.isDatabaseLoaded;
 DataManager.isDatabaseLoaded = function() {
   Kru.RP.DataManager_isDatabaseLoaded.call(this);
+
+  if(Kru.RP.factions.length) {
+    return true;
+  }
 
   // Store our factions.
   for(let i = 0; i < $dataSystem.variables.length; i++) {
