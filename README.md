@@ -46,7 +46,7 @@ A system for keeping track of the reputation of your party across multiple
 groups or factions. Allows you to have named values for different reputation
 values (e.g. "Known", "Famous", etc.). Works with builtin variables for ease of
 use. Also allows discounts at shops based on your reputation. You can even have
-special graphics for each group or faction. *Requires Kru Core.*
+special graphics for each group or faction. *Requires Kru Core.* [wiki/Kru_Reputation](documentation) [demo](https://games.krues8dr.com/demo/Kru_Reputation/)
 
 ## [Skill Tree](Kru_SkillTree.js)
 *work in progress*
@@ -67,3 +67,9 @@ points can also be disabled entirely. *Requires Kru Core.*
 Automatically triggers class change when certain conditions are met. Currently
 only checks on level up or when assinging stats with the Assign Stats plugin.
 *Requires Kru Core.*
+
+## [Demo](Kru_Demo.js)
+This plugin makes it easier to deploy multiple games on a single webserver, by
+allowing each instance to share the core game assets. It also allows you to
+specify a custom html container element for the game to load in, so that you
+can create a wrapper frame around the game. [demo](https://games.krues8dr.com/demo/Kru_Reputation/)
