@@ -377,7 +377,7 @@ Kru.RP.__adjustPrice = function(price, adjustment) {
 KruFactionDiscountPrice = function() {
   [faction, level, discount] = Kru.RP.__processFactionDiscountArgs(arguments);
 
-  if(faction && Kru.RP.factionValue(faction) > level) {
+  if(faction && Kru.RP.factionValue(faction) >= level) {
     $gameMap._events[$gameMap._interpreter._eventId]._discount = discount;
   }
 }
