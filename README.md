@@ -46,7 +46,7 @@ A system for keeping track of the reputation of your party across multiple
 groups or factions. Allows you to have named values for different reputation
 values (e.g. "Known", "Famous", etc.). Works with builtin variables for ease of
 use. Also allows discounts at shops based on your reputation. You can even have
-special graphics for each group or faction. *Requires Kru Core.* [documentation](wiki/Kru_Reputation) | [demo](https://games.krues8dr.com/demo/Kru_Reputation/)
+special graphics for each group or faction. *Requires Kru Core.* [documentation](https://github.com/krues8dr/rpgmakermv-plugins/wiki/Kru_Reputation) | [demo](https://games.krues8dr.com/demo/Kru_Reputation/)
 
 ## [Skill Tree](Kru_SkillTree.js)
 *work in progress*
