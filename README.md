@@ -48,6 +48,11 @@ values (e.g. "Known", "Famous", etc.). Works with builtin variables for ease of
 use. Also allows discounts at shops based on your reputation. You can even have
 special graphics for each group or faction. *Requires Kru Core.* [documentation](https://github.com/krues8dr/rpgmakermv-plugins/wiki/Kru_Reputation) | [demo](https://games.krues8dr.com/demo/Kru_Reputation/)
 
+## [Game Seed](Kru_GameSeed.js)
+Creates a custom "seed" number that can be used to create pseudo-random events
+that persist across the length of a game. E.g., one of several paths is blocked
+by debris, but the path changes each game. [documentation](https://github.com/krues8dr/rpgmakermv-plugins/wiki/Kru_GameSeed) | [demo](https://games.krues8dr.com/demo/Kru_GameSeed/)
+
 ## [Skill Tree](Kru_SkillTree.js)
 *work in progress*
 
