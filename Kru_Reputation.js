@@ -173,22 +173,24 @@ if(!Imported.Kru_Core) {
 
 Kru.RP.DataManager_isDatabaseLoaded = DataManager.isDatabaseLoaded;
 DataManager.isDatabaseLoaded = function() {
-  Kru.RP.DataManager_isDatabaseLoaded.call(this);
+  let result = Kru.RP.DataManager_isDatabaseLoaded.call(this);
 
   if(Kru.RP.factions.length) {
-    return true;
+    return result;
   }
 
   // Store our factions.
-  for(let i = 0; i < $dataSystem.variables.length; i++) {
-    if($dataSystem.variables[i].substr(0, Kru.RP.prefix.length) == Kru.RP.prefix) {
-      [trash, name] = $dataSystem.variables[i].split(':');
-      Kru.RP.factions.push(name.trim());
-      Kru.RP.factionMap[name.trim()] = i;
+  if($dataSystem) {
+    for(let i = 0; i < $dataSystem.variables.length; i++) {
+      if($dataSystem.variables[i].substr(0, Kru.RP.prefix.length) == Kru.RP.prefix) {
+        [trash, name] = $dataSystem.variables[i].split(':');
+        Kru.RP.factions.push(name.trim());
+        Kru.RP.factionMap[name.trim()] = i;
+      }
     }
   }
 
-  return true;
+  return result;
 };
 
 Kru.RP.factionValue = function(name) {
