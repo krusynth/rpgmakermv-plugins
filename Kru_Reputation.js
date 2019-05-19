@@ -171,26 +171,23 @@ if(!Imported.Kru_Core) {
  * Setup our factions.
  */
 
-Kru.RP.DataManager_isDatabaseLoaded = DataManager.isDatabaseLoaded;
-DataManager.isDatabaseLoaded = function() {
-  let result = Kru.RP.DataManager_isDatabaseLoaded.call(this);
+Kru.helpers.addEvent('$dataSystem', loadFactions);
+
+function loadFactions(obj, name) {
+  console.log(name, obj, $dataSystem);
 
   if(Kru.RP.factions.length) {
-    return result;
+    return;
   }
 
   // Store our factions.
-  if($dataSystem) {
-    for(let i = 0; i < $dataSystem.variables.length; i++) {
-      if($dataSystem.variables[i].substr(0, Kru.RP.prefix.length) == Kru.RP.prefix) {
-        [trash, name] = $dataSystem.variables[i].split(':');
-        Kru.RP.factions.push(name.trim());
-        Kru.RP.factionMap[name.trim()] = i;
-      }
+  for(let i = 0; i < $dataSystem.variables.length; i++) {
+    if($dataSystem.variables[i].substr(0, Kru.RP.prefix.length) == Kru.RP.prefix) {
+      [trash, name] = $dataSystem.variables[i].split(':');
+      Kru.RP.factions.push(name.trim());
+      Kru.RP.factionMap[name.trim()] = i;
     }
   }
-
-  return result;
 };
 
 Kru.RP.factionValue = function(name) {

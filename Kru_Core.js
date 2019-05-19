@@ -32,25 +32,27 @@ Kru.Parameters = PluginManager.parameters('Kru_Core');
 
 /*** Helpers ***/
 if(!Kru.helpers) {
-  Kru.helpers = {};
+  Kru.helpers = {
+    _events: {}
+  };
 }
 
 Kru.helpers.getMapData = function(mapId, callback) {
-  var filename = 'Map%1.json'.format(mapId.padZero(3));
+  let filename = 'Map%1.json'.format(mapId.padZero(3));
   return this.getFileData(filename, callback);
 };
 
 // Gets data from a JSON file.
 // Unlike the original version, this is synchronous and returns the result.
 Kru.helpers.getFileData = function(src, callback) {
-  var data;
+  let data;
 
-  var xhr = new XMLHttpRequest();
-  var url = 'data/' + src;
+  let xhr = new XMLHttpRequest();
+  let url = 'data/' + src;
   xhr.open('GET', url, false);
   xhr.overrideMimeType('application/json');
   xhr.onload = function() {
-    if (xhr.status < 400) {
+    if(xhr.status < 400) {
       data = JSON.parse(xhr.responseText);
       DataManager.extractMetadata(data);
 
@@ -67,16 +69,95 @@ Kru.helpers.getFileData = function(src, callback) {
   return data;
 };
 
+/* TODO: Convert all usage of parseNoteTags into DataManager.extractMetadata */
+
+// Override loadDataFile so we get the name of our object in onLoad.
+DataManager.loadDataFile = function(name, src) {
+  var xhr = new XMLHttpRequest();
+  var url = 'data/' + src;
+  xhr.open('GET', url);
+  xhr.overrideMimeType('application/json');
+  xhr.onload = function() {
+    if (xhr.status < 400) {
+      window[name] = JSON.parse(xhr.responseText);
+      console.log('loadDataFile', name)
+      DataManager.onLoad(window[name], name);
+    }
+  };
+  xhr.onerror = function() {
+    DataManager._errorUrl = DataManager._errorUrl || url;
+  };
+  window[name] = null;
+  xhr.send();
+};
+
+// Modify onLoad to callback any events.
+Kru.helpers.DataManager_onLoad = DataManager.onLoad;
+DataManager.onLoad = function(object, name) {
+  console.log('onLoad', name, object);
+  Kru.helpers.DataManager_onLoad.call(this, object);
+  Kru.helpers.eventCallback(name, object)
+}
+
+Kru.helpers.addEvent = function(name, fn) {
+  if(typeof Kru.helpers._events[name] == 'undefined') {
+    Kru.helpers._events[name] = [];
+  }
+  Kru.helpers._events[name].push(fn);
+}
+
+Kru.helpers.eventCallback = function(name, object) {
+  if(typeof Kru.helpers._events[name] !== 'undefined' &&
+    Array.isArray(Kru.helpers._events[name])) {
+    for(let i = 0; i < Kru.helpers._events[name].length; i++) {
+      Kru.helpers._events[name][i](object, name);
+    }
+  }
+}
+
+Kru.helpers.DataManager_extractMetadata = DataManager.extractMetadata
+DataManager.extractMetadata = function(data) {
+  let note = data.note;
+  data.meta = {};
+
+  // First pass: tags.
+  let re = /<([^<>:]+)(:?)([^>]*)>/g;
+  while(true) {
+    let match = re.exec(note);
+    if (match) {
+      if (match[2] === ':') {
+        data.meta[match[1]] = match[3];
+      } else {
+        data.meta[match[1]] = true;
+      }
+      note = note.replace(match[0], '');
+      console.log('match', match[0]);
+    } else {
+      break;
+    }
+  }
+
+  // Second pass: assume single-line JSON elements.
+  let notes = note.split(/\r?\n/);
+  for(let i = 0; i < notes.length; i++) {
+    try {
+      let tmpData = JSON.parse(notes[i]);
+      Object.assign(data, tmpData);
+    } catch(e) {};
+  }
+}
+
 // Parse tags into an object
 Kru.helpers.parseNoteTags = function(note) {
   if(typeof(note) == 'string' && note.length > 0) {
-    var data = {};
+    let data = {};
 
     // If we have JSON, use that.
-    var notes = note.split(/\r?\n/);
-    for(pNT = 0; pNT < notes.length; pNT++) {
+    let notes = note.split(/\r?\n/);
+    for(let pNT = 0; pNT < notes.length; pNT++) {
       try {
-        Object.assign(data, JSON.parse(notes[pNT]));
+        let tmpData = JSON.parse(notes[pNT]);
+        Object.assign(data, tmpData);
       } catch(e) {};
     }
     if(Object.keys(data).length > 0) {
@@ -84,26 +165,26 @@ Kru.helpers.parseNoteTags = function(note) {
     }
 
     // Otherwise we have to parse some tags.
-    var regex = /<([A-Za-z0-9-_]+) ?(.*?)>/g;
-    var result = {};
+    let regex = /<([A-Za-z0-9-_]+) ?(.*?)>/g;
+    let result = {};
     while(m = regex.exec(note)) {
-      var name = m[1];
+      let name = m[1];
 
       // If we have multiple arguments, create a list.
-      var value = m[2].split(' ');
+      let value = m[2].split(' ');
       if(value.length > 1) {
         // If we have an assignment, we have a hash map.
         if(value[0].split('=').length > 1) {
-          var values = {};
-          for(j = 0; j < value.length; j++) {
-            var valObj = value[j].split('=');
+          let values = {};
+          for(let j = 0; j < value.length; j++) {
+            let valObj = value[j].split('=');
             values[valObj[0]] = Kru.helpers.normalizeValues(valObj[1]);
           }
         }
         // Otherwise we have a list of values
         else {
           values = [];
-          for(j = 0; j < value.length; j++) {
+          for(let j = 0; j < value.length; j++) {
             values.push(Kru.helpers.normalizeValues(value[j]));
           }
         }
@@ -134,7 +215,7 @@ Kru.helpers.processNotes = function(type) {
   if(type === 'skills') {
     // Only process once.
     if(typeof($dataSkills._kru_processed) === 'undefined') {
-      for(i = 0; i < $dataSkills.length; i++) {
+      for(let i = 0; i < $dataSkills.length; i++) {
         if($dataSkills[i]) {
           $dataSkills[i]._notes = Kru.helpers.parseNoteTags($dataSkills[i].note);
         }
@@ -145,7 +226,7 @@ Kru.helpers.processNotes = function(type) {
   else if(type === 'classes') {
     // Only process once.
     if(typeof($dataClasses._kru_processed) === 'undefined') {
-      for(i = 0; i < $dataClasses.length; i++) {
+      for(let i = 0; i < $dataClasses.length; i++) {
         if($dataClasses[i]) {
           $dataClasses[i]._notes = Kru.helpers.parseNoteTags($dataClasses[i].note);
         }
@@ -229,7 +310,7 @@ Kru.helpers.WindowManager.prototype.text = function() {};
  * Window mixin
  */
 
-var Kru_WindowMixin = function() {
+function Kru_WindowMixin() {
   this._iconSet = 'IconSet';
   this._iconWidth = Window_Base._iconWidth;
   this._iconHeight = Window_Base._iconHeight;
@@ -266,17 +347,17 @@ var Kru_WindowMixin = function() {
 
     let cols = Math.round(this.bitmap.width / this._iconWidth);
 
-    var pw = this._iconWidth;
-    var ph = this._iconHeight;
-    var sx = iconIndex % cols * pw;
-    var sy = Math.floor(iconIndex / cols) * ph;
+    let pw = this._iconWidth;
+    let ph = this._iconHeight;
+    let sx = iconIndex % cols * pw;
+    let sy = Math.floor(iconIndex / cols) * ph;
     this.contents.blt(this.bitmap, sx, sy, pw, ph, x, y);
   };
 
   this.drawItemName = function(item, x, y, width) {
     width = width || 312;
     if (item) {
-        var iconBoxWidth = this._iconWidth + 4;
+        let iconBoxWidth = this._iconWidth + 4;
         this.resetTextColor();
         this.drawIcon(item.iconIndex, x + 2, y + 2);
         this.drawText(item.name, x + iconBoxWidth, y, width - iconBoxWidth);
@@ -348,8 +429,8 @@ Kru_GenericListWindow.prototype.maxItems = function() {
 };
 
 Kru_GenericListWindow.prototype.drawItem = function(index) {
-  var content = this._data[index];
-  var yOffset = this.lineHeight() * index;
+  let content = this._data[index];
+  let yOffset = this.lineHeight() * index;
 
   if(typeof content === 'object') {
     this.drawItemName(content, 0, yOffset, this._win._w);
@@ -365,7 +446,7 @@ Kru_GenericListWindow.prototype.updateHelp = function() {
 
 // Stolen from Window_ItemList.
 Kru_GenericListWindow.prototype.item = function() {
-    var index = this.index();
+    let index = this.index();
     return this._data && index >= 0 ? this._data[index] : null;
 };
 
@@ -394,14 +475,14 @@ Kru_GenericHelpWindow.prototype.drawTextExOrig = Window_Base.prototype.drawTextE
 Kru_GenericHelpWindow.prototype.drawTextEx = function(text, x, y) {
 
   //One character width
-  var charW = this.textWidth('X');
-  var width = this._win._w - (2 * this.textPadding());
-  var charsPerLine = Math.floor(width / charW);
+  let charW = this.textWidth('X');
+  let width = this._win._w - (2 * this.textPadding());
+  let charsPerLine = Math.floor(width / charW);
 
-  var newText = '';
+  let newText = '';
   // TODO: break on spaces instead of just line width.
   // TODO: fix spaces at the beginning of a line.
-  for(i = 0; i < text.length; i += (charsPerLine - 2)) {
+  for(let i = 0; i < text.length; i += (charsPerLine - 2)) {
     newText += text.substring(i, i+(charsPerLine - 2)) + "\n";
   }
 
@@ -478,19 +559,19 @@ Kru_CustomListWindow.prototype.drawFooter = function() {};
 
 Kru_CustomListWindow.prototype.drawAllLines = function() {
   if(this.lines && this.lines.length > 0) {
-    for (var i = 0; i < this.lines.length; i++) {
+    for (let i = 0; i < this.lines.length; i++) {
       this.drawLine(this.lines[i]);
     }
   }
 };
 
 Kru_CustomListWindow.prototype.drawLine = function(line) {
-  var color = '#ffffff';
+  let color = '#ffffff';
   if(typeof(line.color) != 'undefined') {
     color = line.color;
   }
 
-  var width = 2;
+  let width = 2;
   if(typeof(line.width) != 'undefined') {
     width = line.width;
   }
@@ -504,7 +585,7 @@ Kru_CustomListWindow.prototype.drawLine = function(line) {
 };
 
 Kru_CustomListWindow.prototype.drawItem = function(index) {
-  var content = this._data[index];
+  let content = this._data[index];
 
   if(typeof content === 'object') {
     this.drawItemName(content, content.location[0], content.location[1], this._win._w);
@@ -517,7 +598,7 @@ Kru_CustomListWindow.prototype.drawItem = function(index) {
 Kru_CustomListWindow.prototype.drawItemName = function(item, x, y, width) {
     width = width || 312;
     if (item) {
-        var iconBoxWidth = Window_Base._iconWidth + 4;
+        let iconBoxWidth = Window_Base._iconWidth + 4;
         if(item.disabled) {
           this.changeTextColor(this.textColor(7));
         }
@@ -525,7 +606,7 @@ Kru_CustomListWindow.prototype.drawItemName = function(item, x, y, width) {
           this.changeTextColor(this.normalColor());
         }
 
-        var x2 = x;
+        let x2 = x;
         if(typeof(item.iconIndex) != 'undefined') {
           this.drawIcon(item.iconIndex, x + 2, y + 2);
           x2 += iconBoxWidth;
@@ -538,11 +619,11 @@ Kru_CustomListWindow.prototype.drawItemName = function(item, x, y, width) {
 
 Kru_CustomListWindow.prototype.updateCursor = function() {
   if (this._cursorAll) {
-    var allRowsHeight = this.maxRows() * this.itemHeight();
+    let allRowsHeight = this.maxRows() * this.itemHeight();
     this.setCursorRect(0, 0, this.contents.width, allRowsHeight);
     this.setTopRow(0);
   } else if (this.isCursorVisible()) {
-    var rect = this.itemRect(this.index());
+    let rect = this.itemRect(this.index());
     if(rect) {
       this.setCursorRect(
         rect.x - rect.margin, rect.y - rect.margin, rect.width, rect.height);
@@ -554,12 +635,12 @@ Kru_CustomListWindow.prototype.updateCursor = function() {
 
 // Reimplement the navigation commands for the tree.
 Kru_CustomListWindow.prototype.itemRect = function(index) {
-    var rect = new Rectangle();
+    let rect = new Rectangle();
     if(typeof(this._data) === 'undefined' ||
       typeof(this._data[index]) === 'undefined') {
       return;
     }
-    var content = this._data[index];
+    let content = this._data[index];
 
     rect.x = content.location[0];
     rect.y = content.location[1];
@@ -643,7 +724,7 @@ Bitmap.prototype.kDrawLine = function(x1, y1, x2, y2, color, width) {
     if(!width) {
       width = 1;
     }
-    var context = this._context;
+    let context = this._context;
     context.save();
     context.strokeStyle = color;
     context.lineWidth = width;
@@ -656,7 +737,7 @@ Bitmap.prototype.kDrawLine = function(x1, y1, x2, y2, color, width) {
 };
 
 Bitmap.prototype.kDrawPolygon = function(points, line, fill) {
-  var context = this._context;
+  let context = this._context;
   context.save();
 
   if(typeof(line.width) != 'undefined') {
@@ -675,7 +756,7 @@ Bitmap.prototype.kDrawPolygon = function(points, line, fill) {
 
   context.moveTo(points[0][0], points[0][1]);
 
-  for(i = 1; i < points.length; i++) {
+  for(let i = 1; i < points.length; i++) {
     context.lineTo(points[i][0], points[i][1]);
   }
 
