@@ -80,7 +80,6 @@ DataManager.loadDataFile = function(name, src) {
   xhr.onload = function() {
     if (xhr.status < 400) {
       window[name] = JSON.parse(xhr.responseText);
-      console.log('loadDataFile', name)
       DataManager.onLoad(window[name], name);
     }
   };
@@ -94,7 +93,6 @@ DataManager.loadDataFile = function(name, src) {
 // Modify onLoad to callback any events.
 Kru.helpers.DataManager_onLoad = DataManager.onLoad;
 DataManager.onLoad = function(object, name) {
-  console.log('onLoad', name, object);
   Kru.helpers.DataManager_onLoad.call(this, object);
   Kru.helpers.eventCallback(name, object)
 }
@@ -131,7 +129,6 @@ DataManager.extractMetadata = function(data) {
         data.meta[match[1]] = true;
       }
       note = note.replace(match[0], '');
-      console.log('match', match[0]);
     } else {
       break;
     }

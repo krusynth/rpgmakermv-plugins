@@ -174,8 +174,6 @@ if(!Imported.Kru_Core) {
 Kru.helpers.addEvent('$dataSystem', loadFactions);
 
 function loadFactions(obj, name) {
-  console.log(name, obj, $dataSystem);
-
   if(Kru.RP.factions.length) {
     return;
   }
