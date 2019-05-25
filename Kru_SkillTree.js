@@ -55,23 +55,25 @@ if(!Imported.Kru_Core) {
  * Setup our actors
  */
 
-Kru.ST.DataManager_isDatabaseLoaded = DataManager.isDatabaseLoaded;
-DataManager.isDatabaseLoaded = function() {
-  Kru.ST.DataManager_isDatabaseLoaded.call(this);
-  Kru.helpers.processNotes('skills');
-  Kru.helpers.processNotes('classes');
-  return true;
-};
+// Kru.ST.DataManager_isDatabaseLoaded = DataManager.isDatabaseLoaded;
+// DataManager.isDatabaseLoaded = function() {
+//   let result = Kru.ST.DataManager_isDatabaseLoaded.call(this);
+//   if(result) {
+//     Kru.helpers.processNotes('skills');
+//     Kru.helpers.processNotes('classes');
+//   }
+//   return result;
+// };
 
 // Setup
 Kru.ST.Game_Actor_Setup = Game_Actor.prototype.setup;
 Game_Actor.prototype.setup = function (actorId) {
   Kru.ST.Game_Actor_Setup.call(this, actorId);
-  if(typeof(this._skillPoints) == 'undefined') {
+  if(typeof this._skillPoints == 'undefined') {
     this._skillPoints = Number(Kru.ST.Parameters['Initial Points']);
   }
   // We store our saved skills under actor._stskills
-  if(typeof(this._stskills) == 'undefined') {
+  if(typeof this._stskills == 'undefined') {
     this._stskills = [];
   }
 };
@@ -123,16 +125,16 @@ Kru_TreeWindow.prototype = Object.create(Kru_CustomListWindow.prototype);
 Kru_TreeWindow.prototype.initialize = function(win) {
   Kru_CustomListWindow.prototype.initialize.call(this, win);
 
-  var classData = $dataClasses[this.actor._classId];
+  let classData = $dataClasses[this.actor._classId];
 
-  this.lines = classData._notes.lines;
-  var skills = classData._notes.skills;
+  this.lines = classData.meta.lines;
+  let skills = classData.meta.skills;
   if(typeof(skills) != 'undefined') {
-    for(i_i = 0; i_i < skills.length; i_i++) {
-      skills[i_i] = Object.assign(skills[i_i], $dataSkills[skills[i_i].id]);
-      skills[i_i]._name = skills[i_i].name;
-      skills[i_i]._description = skills[i_i].description;
-      skills[i_i] = this.updateSkill(skills[i_i]);
+    for(let i = 0; i < skills.length; i++) {
+      skills[i] = Object.assign(skills[i], $dataSkills[skills[i].id]);
+      skills[i]._name = skills[i].name;
+      skills[i]._description = skills[i].description;
+      skills[i] = this.updateSkill(skills[i]);
     }
   }
   this._data = skills;
@@ -151,20 +153,20 @@ Kru_TreeWindow.prototype.updateSkill = function(skill) {
   skill.description = skill._name + ' - ' + skill._description;
 
   // Show any requirements in the description.
-  if(skill._notes.req) {
+  if(skill.meta.req) {
     // Level requirement.
-    if(skill._notes.req.level) {
+    if(skill.meta.req.level) {
       skill.description += ' Must be level ' +
-        String(skill._notes.req.level) + '.';
+        String(skill.meta.req.level) + '.';
     }
 
     // Previous skill requirement.
-    if(skill._notes.req.skill) {
-      var reqs = [];
-      for(j = 0; j < skill._notes.req.skill.length; j++) {
-        var req = $dataSkills[skill._notes.req.skill[j].id].name;
-        if(skill._notes.req.skill[j].level) {
-          req += ' level ' + String(skill._notes.req.skill[j].level);
+    if(skill.meta.req.skill) {
+      let reqs = [];
+      for(let j = 0; j < skill.meta.req.skill.length; j++) {
+        let req = $dataSkills[skill.meta.req.skill[j].id].name;
+        if(skill.meta.req.skill[j].level) {
+          req += ' level ' + String(skill.meta.req.skill[j].level);
         }
         reqs.push(req);
       }
@@ -173,11 +175,11 @@ Kru_TreeWindow.prototype.updateSkill = function(skill) {
   }
 
   // Show the current/max level as the name.
-  var lvl = 0;
+  let lvl = 0;
   if(this.actor._stskills[skill.id]) {
     lvl = Number(this.actor._stskills[skill.id].level);
   }
-  var max = skill._notes.max || 1;
+  let max = skill.meta.max || 1;
 
   skill.name = String(lvl) + '/' + String(max);
 
@@ -192,13 +194,13 @@ Kru_TreeWindow.prototype.updateSkill = function(skill) {
 };
 
 Kru_TreeWindow.prototype.updateAllSkills = function() {
-  for(uAS_i = 0; uAS_i < this._data.length; uAS_i++) {
-    this._data[uAS_i] = this.updateSkill(this._data[uAS_i]);
+  for(let i = 0; i < this._data.length; i++) {
+    this._data[i] = this.updateSkill(this._data[i]);
   }
 }
 
 Kru_TreeWindow.prototype.onOk = function() {
-  var skill = this._data[this.index()];
+  let skill = this._data[this.index()];
 
   // Failure states.
   if(this.actor._skillPoints == 0) {
@@ -211,8 +213,8 @@ Kru_TreeWindow.prototype.onOk = function() {
   }
 
   // Past the max.
-  if(skill._notes.max && this.actor._stskills[skill.id] &&
-    this.actor._stskills[skill.id].level == skill._notes.max) {
+  if(skill.meta.max && this.actor._stskills[skill.id] &&
+    this.actor._stskills[skill.id].level == skill.meta.max) {
       return this.failState();
   }
 
@@ -225,19 +227,21 @@ Kru_TreeWindow.prototype.onOk = function() {
   this.actor._stskills[skill.id].level++;
   this.actor._skillPoints--;
 
+  this.actor.learnSkill(skill.id);
+
   this.updateAllSkills();
   this.refresh();
   this.activate();
 };
 
 Kru_TreeWindow.prototype.skillAvailable = function(actor, skill) {
-  if(skill._notes.req) {
-    if(skill._notes.req.level && actor._level < skill._notes.req.level) {
+  if(skill.meta.req) {
+    if(skill.meta.req.level && actor._level < skill.meta.req.level) {
       return false
     }
-    if(skill._notes.req.skill) {
-      for(sA_i = 0; sA_i < skill._notes.req.skill.length; sA_i++) {
-        var req = skill._notes.req.skill[sA_i];
+    if(skill.meta.req.skill) {
+      for(sA_i = 0; sA_i < skill.meta.req.skill.length; sA_i++) {
+        let req = skill.meta.req.skill[sA_i];
         if(!actor._stskills[req.id]) {
           return false;
         }
@@ -261,14 +265,14 @@ Kru_TreeWindow.prototype.redrawItem = function(index) {
 };
 
 Kru_TreeWindow.prototype.drawHeader = function() {
-  var content = $dataClasses[this.actor._classId].name;
+  let content = $dataClasses[this.actor._classId].name;
 
   // Arbitrarily set this in the top left corner.
   this.contents.drawText(content, 0, 10, 250, 10, 'left');
 };
 
 Kru_TreeWindow.prototype.drawFooter = function() {
-  var content = String(this.actor._skillPoints) + ' Pts';
+  let content = String(this.actor._skillPoints) + ' Pts';
   // Arbitrarily set this in the bottom right corner.
   this.contents.drawText(content, 670, 415, 100, 10, 'right');
 };
@@ -290,14 +294,14 @@ Scene_Skill.prototype.commandSkill = function() {
 };
 
 function Scene_SkillChoice() {
-    this.initialize.apply(this, arguments);
+  this.initialize.apply(this, arguments);
 };
 
 Scene_SkillChoice.prototype = Object.create(Scene_ItemBase.prototype);
 Scene_SkillChoice.prototype.constructor = Scene_Skill;
 
 Scene_SkillChoice.prototype.initialize = function() {
-    Scene_ItemBase.prototype.initialize.call(this);
+  Scene_ItemBase.prototype.initialize.call(this);
 };
 
 Scene_SkillChoice.prototype.create = function() {
@@ -306,7 +310,7 @@ Scene_SkillChoice.prototype.create = function() {
   this.wm = new Kru.helpers.WindowManager(this);
 
   // Top Window: skill tree.
-  var treeWin = this.wm.addWindow({
+  let treeWin = this.wm.addWindow({
       width: 1,
       height: 0.75,
       type: 'skilltree'
@@ -315,7 +319,7 @@ Scene_SkillChoice.prototype.create = function() {
   treeWin.window.activate();
 
   // Bottom Window: skill details.
-  var infoWindow = this.wm.addWindow({
+  let infoWindow = this.wm.addWindow({
     width: 1,
     height: .25,
     type: 'help',
@@ -323,7 +327,7 @@ Scene_SkillChoice.prototype.create = function() {
     setItem: function(item) {
       this.contents.clear();
 
-      var content = '';
+      let content = '';
       if(item) {
         content = item.description;
       }
