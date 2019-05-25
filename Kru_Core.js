@@ -116,7 +116,9 @@ Kru.helpers.eventCallback = function(name, object) {
 Kru.helpers.DataManager_extractMetadata = DataManager.extractMetadata
 DataManager.extractMetadata = function(data) {
   let note = data.note;
-  data.meta = {};
+  if(typeof data.meta == 'undefined') {
+    data.meta = {};
+  }
 
   // First pass: tags.
   let re = /<([^<>:]+)(:?)([^>]*)>/g;
@@ -139,7 +141,7 @@ DataManager.extractMetadata = function(data) {
   for(let i = 0; i < notes.length; i++) {
     try {
       let tmpData = JSON.parse(notes[i]);
-      Object.assign(data, tmpData);
+      Object.assign(data.meta, tmpData);
     } catch(e) {};
   }
 }
