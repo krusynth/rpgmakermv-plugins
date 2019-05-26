@@ -12,7 +12,8 @@
  * Information
  * ============================================================================
  *
- * Adds the ability for players to buy skills from a skill tree.
+ * Adds the ability for players to buy skills from a skill tree. Skills can have
+ * levels which can impact their efficacy and cost.
  *
  * @param Skill Points
  * @desc Number of skill points to award per level
@@ -31,6 +32,7 @@
  *  Add support for items that add bonuses to skills.
  *  Fix sounds on class change.
  *  Document skill parameters.
+ *  Allow custom cost for skills.
  */
 
 var Imported = Imported || {};
@@ -49,6 +51,11 @@ Kru.ST.Parameters['Initial Points'] = Number(Kru.ST.Parameters['Initial Points']
 if(!Imported.Kru_Core) {
   alert("Kru_SkillTree requires Kru_Core.");
   throw new Error("Kru_SkillTree requires Kru_Core.");
+}
+
+if(!Imported.Kru_SkillCore) {
+  alert("Kru_SkillTree requires Kru_SkillCore.");
+  throw new Error("Kru_SkillTree requires Kru_SkillCore.");
 }
 
 /*
