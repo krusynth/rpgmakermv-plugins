@@ -28,9 +28,9 @@
 
 /*
  * TODO:
- *  Properly add skills for use in battle.
  *  Add support for items that add bonuses to skills.
  *  Fix sounds on class change.
+ *  Document skill parameters.
  */
 
 var Imported = Imported || {};
