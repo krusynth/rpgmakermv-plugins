@@ -1,9 +1,9 @@
 //=============================================================================
 // Skill Tree
-// Version: 1.0.0
+// Version: 1.0.1
 //=============================================================================
 /*:
- * @plugindesc v1.0.0 Skill Tree system
+ * @plugindesc Skill Tree system
  *
  * @author Krues8dr
  *
@@ -32,7 +32,10 @@
  *  Add support for items that add bonuses to skills.
  *  Fix sounds on class change.
  *  Document skill parameters.
- *  Allow custom cost for skills.
+ *  Allow custom cost for skills (items, strength, etc).
+ *  Add additional requirements to unlock skills (strength, etc).
+ *  Change sound to buzzer if you can't buy more levels.
+ *  If a class has a skill by default, set the level to some value.
  */
 
 var Imported = Imported || {};
@@ -47,6 +50,40 @@ Kru.ST.Parameters = PluginManager.parameters('Kru_SkillTree');
 Kru.ST.Parameters['Skill Points'] = Number(Kru.ST.Parameters['Skill Points']);
 Kru.ST.Parameters['Initial Points'] = Number(Kru.ST.Parameters['Initial Points']);
 
+// Helper methods
+
+// Test if the given actor has a skill, return the level if so.
+function actorSkill(actorId, skill) {
+  // If our skill is a name not an id.
+  if(!Number.isInteger(skill)) {
+    for(let i = 0; i < $dataSkills.length; i++) {
+      if($dataSkills[i] && $dataSkills[i].name &&
+        $dataSkills[i].name.toLowerCase() == skill.toLowerCase()
+      ) {
+        skill = $dataSkills[i].id;
+        break;
+      }
+    }
+  }
+  if($gameActors._data[actorId]._stskills[skill]) {
+    return $gameActors._data[actorId]._stskills[skill].level;
+  }
+
+  return 0;
+}
+
+// Test if anyone in the party has a skill at a particular level (defaults to 1).
+function partySkill(skill, level) {
+  level = level || 1;
+  let result = $gameParty._actors.filter(function(actorId) {
+    let skillLevel = actorSkill(actorId, skill);
+    return skillLevel && skillLevel >= level;
+  });
+  if(!result.length) {
+    result = false;
+  }
+  return result;
+}
 
 if(!Imported.Kru_Core) {
   alert("Kru_SkillTree requires Kru_Core.");
@@ -57,20 +94,6 @@ if(!Imported.Kru_SkillCore) {
   alert("Kru_SkillTree requires Kru_SkillCore.");
   throw new Error("Kru_SkillTree requires Kru_SkillCore.");
 }
-
-/*
- * Setup our actors
- */
-
-// Kru.ST.DataManager_isDatabaseLoaded = DataManager.isDatabaseLoaded;
-// DataManager.isDatabaseLoaded = function() {
-//   let result = Kru.ST.DataManager_isDatabaseLoaded.call(this);
-//   if(result) {
-//     Kru.helpers.processNotes('skills');
-//     Kru.helpers.processNotes('classes');
-//   }
-//   return result;
-// };
 
 // Setup
 Kru.ST.Game_Actor_Setup = Game_Actor.prototype.setup;

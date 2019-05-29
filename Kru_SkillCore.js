@@ -3,7 +3,7 @@
 // Version: 1.0.0
 //=============================================================================
 /*:
- * @plugindesc 1.0.0 Shared base for Krues8dr skill-related plugins
+ * @plugindesc Shared base for Krues8dr skill-related plugins
  *
  * @author Krues8dr
  *
