@@ -8,17 +8,18 @@
  * @help
  * This plugin allows for events that are bigger than one tiles, by
  * expanding the collision box via notes. This works nicely for
- * larger sprites and allows for movement per normal.
+ * larger sprites and allows for movement per normal. This tag uses
+ * JSON in the notes field, instead of tags.
  *
  * By default all events are 1 tile high and 1 tile wide. To make a
- * larger event add a note of the format <size h=# w=#> where the h
- * and w are the number of tiles to *add* to the height and width
- * respectively. For example, <size h=1 w=0> will result in a 2-tile
- * tall, 1 tile wide event.
+ * larger event add a note of the format {"size": {"w": #, "h": #}}
+ * where the h and w are the number of tiles to *add* to the height
+ * and width respectively. For example, {"size":{"w":[-1,1],"h":2}}
+ * will result in a 2-tile tall, 1 tile wide event.
  *
  * You can also specify an offset from the main event tile by using
- * a pair of values e.g.: <size h=-1,1 w=-1,1> will result in a 3x3
- * entity centered on the event's location.
+ * a pair of values e.g.: {"size": {"w": [-1,1], "h": [-1,1]}}
+ * will result in a 3x3 entity centered on the event's location.
  *
  * These are evaluated when the event is loaded for the map, not
  * when the data is loaded.
@@ -48,8 +49,8 @@ Game_Event.prototype.initialize = function(mapId, eventId) {
     Game_Character.prototype.initialize.call(this);
     this._mapId = mapId;
     this._eventId = eventId;
-    var event = this.event();
-    event.meta = Kru.helpers.parseNoteTags(event.note);
+    let event = this.event();
+    // event.meta = Kru.helpers.parseNoteTags(event.note);
 
     this.Kru_handleSizing(event);
     this.locate(event.x, event.y);
@@ -61,29 +62,32 @@ Game_Event.prototype.Kru_handleSizing = function(event) {
     typeof(event.meta) !== 'undefined' &&
     typeof(event.meta.size) !== 'undefined'
   ) {
-    var size = event.meta.size;
+    let size = event.meta.size;
 
-    if(size.w) {
-      var tmp_w = size.w.split(',');
+    if(typeof size.w !== 'undefined') {
       // If we have only one number, start at zero.
-      if(tmp_w[1] === undefined) {
-        this._w = [0, parseInt(tmp_w[0])]
+      if(!Array.isArray(size.w)) {
+        this._w = [0, size.w];
       }
       else {
-        this._w = [parseInt(tmp_w[0]), parseInt(tmp_w[1])]
+        this._w = size.w;
       }
     }
+    else {
+      this._w = [0, 0];
+    }
 
-    if(size.h) {
-      var tmp_h = size.h.split(',');
-
+    if(typeof size.h !== 'undefined') {
       // If we have only one number, start at zero.
-      if(tmp_h[1] === undefined) {
-        this._h = [0, parseInt(tmp_h[0])]
+      if(!Array.isArray(size.h)) {
+        this._h = [0, size.h];
       }
       else {
-        this._h = [parseInt(tmp_h[0]), parseInt(tmp_h[1])]
+        this._h = size.h;
       }
+    }
+    else {
+      this._h = [0, 0];
     }
   }
 }
@@ -100,7 +104,7 @@ Game_CharacterBase.prototype.pos = function(x, y) {
 
 // Fix collision checking to ignore itself.
 Game_Event.prototype.isCollidedWithEvents = function(x, y) {
-    var events = $gameMap.eventsXyNt(x, y).filter(function(event) {
+    let events = $gameMap.eventsXyNt(x, y).filter(function(event) {
       return (event._eventId !== this._eventId);
     }.bind(this));
     return events.length > 0;
