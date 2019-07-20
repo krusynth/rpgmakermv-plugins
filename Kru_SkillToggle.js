@@ -98,8 +98,7 @@ Window_SkillList.prototype.setHelpWindowItem = function(item) {
       }
 
       if(msg) {
-        let pos = Graphics.boxWidth - this.textWidth(msg) + this.spacing() * 2;
-        this._helpWindow.drawText(msg, 0, 36, pos, 'right')
+        this._helpWindow.drawText(msg, 0, 0, Graphics.boxWidth - this.padding*2, 'right')
       }
       this.resetTextColor();
     }
