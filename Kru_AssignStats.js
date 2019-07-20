@@ -41,6 +41,7 @@
  *  Make param list configurable.
  *  Set a minimum level to allow the user to start customizing, so that new
  *   players aren't overwhelmed.
+ *  Make initial points toggleable if Level == 1 or not.
  */
 
 var Imported = Imported || {};

@@ -44,6 +44,8 @@ Game_BattlerBase.prototype.canPaySkillCost = function(skill) {
 Kru.SC.Game_BattlerBase___skillMpCost = Game_BattlerBase.prototype.skillMpCost;
 Game_BattlerBase.prototype.skillMpCost = function(item) {
   let cost = Kru.SC.Game_BattlerBase___skillMpCost.call(this, item);
+  let skill = this._stskills[item.id];
+
   if(item.meta.cost && item.meta.cost.mp) {
     let a = this;
     eval(item.meta.cost.mp);

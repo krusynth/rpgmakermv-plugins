@@ -1,9 +1,9 @@
 //=============================================================================
 // Krues8dr Core
-// Version: 1.0.0
+// Version: 1.0.1
 //=============================================================================
 /*:
- * @plugindesc 1.0.0 Shared base for many Krues8dr plugins
+ * @plugindesc Shared base for many Krues8dr plugins
  *
  * @author Krues8dr
  *
