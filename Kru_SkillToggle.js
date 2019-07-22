@@ -98,7 +98,7 @@ Window_SkillList.prototype.setHelpWindowItem = function(item) {
       }
 
       if(msg) {
-        this._helpWindow.drawText(msg, 0, 0, Graphics.boxWidth - this.padding*2, 'right')
+        this._helpWindow.drawText(msg, 0, 32, Graphics.boxWidth - this.padding*2, 'right')
       }
       this.resetTextColor();
     }
@@ -237,7 +237,7 @@ Window_Base.prototype.drawActorLevel = function(actor, x, y) {
 };
 
 // Show our reserved values.
-Kru.STog.Window_Base___drawActorSimpleStatus = Window_Base.prototype.drawActorSimpleStatus;
+Kru.STog.Window_Base___drawActorHp = Window_Base.prototype.drawActorHp;
 Window_Base.prototype.drawActorHp = function(actor, x, y, width) {
   width = width || 186;
   let color1 = this.hpGaugeColor1();
