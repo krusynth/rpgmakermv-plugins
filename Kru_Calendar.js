@@ -77,6 +77,10 @@
  * @info Use the following codes: %M (Month) %d (day) %Y (Year) %N (days count)
  * @type text
  * @default %M %d %Y
+ *
+ * @param NewDayMessage
+ * @info Show the date each time KruPassDays() gets called.
+ * @type boolean
  */
 /*~struct~Month:
  * @param Name
@@ -85,6 +89,7 @@
  * @param Days
  * @text Days in Month
  * @type number
+ * @default false
  */
 
 var Imported = Imported || {};
@@ -99,6 +104,7 @@ Kru.Cal.params.OffsetYears = parseInt(Kru.Cal.params.OffsetYears);
 Kru.Cal.params.Variable = parseInt(Kru.Cal.params.Variable);
 Kru.Cal.params.DaysInYear = 0;
 Kru.Cal.params.Months = JSON.parse(Kru.Cal.params.Months);
+Kru.Cal.params.NewDayMessage = (Kru.Cal.params.NewDayMessage === "true");
 
 for(let i = 0; i < Kru.Cal.params.Months.length; i++) {
   Kru.Cal.params.Months[i] = JSON.parse(Kru.Cal.params.Months[i]);
@@ -148,6 +154,10 @@ function KruPassDays(days) {
   $gameVariables._data[Kru.Cal.params.Variable] += parseInt(days);
 
   $gameSystem.kruHandleEvents();
+
+  if(Kru.Cal.params.NewDayMessage) {
+    $gameMessage.add(KruShowDate() + '\f');
+  }
 }
 
 /* Events system */
