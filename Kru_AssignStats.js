@@ -42,6 +42,7 @@
  *  Set a minimum level to allow the user to start customizing, so that new
  *   players aren't overwhelmed.
  *  Make initial points toggleable if Level == 1 or not.
+ *  Allow function for points per level.
  */
 
 var Imported = Imported || {};
@@ -49,7 +50,51 @@ Imported.Kru_AssignStats = "1.0.0";
 
 var Kru = Kru || {};
 Kru.AS = {
-  config: {}
+  config: {},
+  Params: [
+    {
+      name: function() { return TextManager.param(this.id); },
+      value: function(actor) { return actor.param(this.id); },
+      description: 'ATtacK power',
+      param: 'atk',
+      id: 2
+    },
+    {
+      name: function() { return TextManager.param(this.id); },
+      value: function(actor) { return actor.param(this.id); },
+      description: 'DEFense power',
+      param: 'def',
+      id: 3
+    },
+    {
+      name: function() { return TextManager.param(this.id); },
+      value: function(actor) { return actor.param(this.id); },
+      description: 'Magic ATtack power',
+      param: 'mat',
+      id: 4
+    },
+    {
+      name: function() { return TextManager.param(this.id); },
+      value: function(actor) { return actor.param(this.id); },
+      description: 'Magic DeFense power',
+      param: 'mdf',
+      id: 5
+    },
+    {
+      name: function() { return TextManager.param(this.id); },
+      value: function(actor) { return actor.param(this.id); },
+      description: 'AGIlity',
+      param: 'agi',
+      id: 6
+    },
+    {
+      name: function() { return TextManager.param(this.id); },
+      value: function(actor) { return actor.param(this.id); },
+      description: 'LUcK',
+      param: 'luk',
+      id: 7
+    }
+  ]
 };
 
 Kru.AS.Parameters = PluginManager.parameters('Kru_AssignStats');
@@ -109,12 +154,13 @@ if(!Kru.AS.Parameters['Default Level Increase']) {
   // Disable the level increase and reset back to base.
   Kru.AS.Game_Actor_paramBase = Game_Actor.prototype.paramBase;
   Game_Actor.prototype.paramBase = function(paramId) {
+    console.log('class', paramId, this.currentClass());
     return this.currentClass().params[paramId][1];
   };
 }
 
 function Scene_Status() {
-    this.initialize.apply(this, arguments);
+  this.initialize.apply(this, arguments);
 }
 
 Scene_Status.prototype = Object.create(Scene_MenuBase.prototype);
@@ -129,15 +175,12 @@ Kru_StatusWindow.prototype = Object.create(Kru_CustomListWindow.prototype);
 Kru_StatusWindow.prototype.initialize = function(win) {
   Kru_CustomListWindow.prototype.initialize.call(this, win);
 
+  let lineHeight = this.lineHeight();
 
+  let params = this.getParams();
 
-  var lineHeight = this.lineHeight();
-
-  var params = this.getParams();
-
-  for (var i = 0; i < params.length; i++) {
-
-    var item = params[i];
+  for (let i = 0; i < params.length; i++) {
+    let item = params[i];
     item.description = item.description || '';
     item.location = item.location || this.getItemLocation(item, i);
     item.width = item.width || 200;
@@ -152,37 +195,27 @@ Kru_StatusWindow.prototype.initialize = function(win) {
 };
 
 Kru_StatusWindow.prototype.getItemLocation = function(item, i) {
-  var lineHeight = this.lineHeight();
+  let lineHeight = this.lineHeight();
   // TODO: Fix placement.
-  var y = 50;
-  var x = 10;
-  var y2 = y + lineHeight * i + this.margin * 2;
+  let y = 50;
+  let x = 10;
+  let y2 = y + lineHeight * i + this.margin * 2;
 
   return [x, y2];
 }
 
 Kru_StatusWindow.prototype.getParams = function() {
-  var params = [];
-
-  // Only show params 0-5.
-  for (var i = 0; i < 6; i++) {
-    var paramId = i + 2;
-
-    params.push({
-      name: TextManager.param(paramId),
-      value: function (id) { return this.actor.param(id)}.bind(this, paramId),
-      id: paramId
-    });
-  }
+  console.log('getParams');
+  let params = Kru.AS.Params;
 
   return params;
 };
 
 Kru_StatusWindow.prototype.drawItem = function(index) {
-  var content = this._data[index];
-
-  this.drawText(content.name, content.location[0], content.location[1], content.width - this.margin, 'left');
-  this.drawText(content.value(), content.location[0], content.location[1], content.width - this.margin, 'right');
+  let content = this._data[index];
+  let name = typeof content.name === 'function' ? content.name() : content.name;
+  this.drawText(name, content.location[0], content.location[1], content.width - this.margin, 'left');
+  this.drawText(content.value(this.actor), content.location[0], content.location[1], content.width - this.margin, 'right');
 };
 
 Kru_StatusWindow.prototype.drawHeader = function () {
@@ -194,14 +227,14 @@ Kru_StatusWindow.prototype.drawHeader = function () {
 };
 
 Kru_StatusWindow.prototype.drawFooter = function() {
-  var content = String(this.actor._statPoints) + ' Pts';
+  let content = String(this.actor._statPoints) + ' Pts';
   // Arbitrarily set this in the bottom right corner.
   this.contents.drawText(content, 670, 415, 100, 10, 'right');
 };
 
 Kru_StatusWindow.prototype.onOk = function() {
-  var stat = this._data[this.index()];
-  var statCost = this.actor.statPointCost(stat.id);
+  let stat = this._data[this.index()];
+  let statCost = this.actor.statPointCost(stat.id);
 
   // Failure states.
   if(this.actor._statPoints < statCost) {
@@ -241,10 +274,8 @@ Scene_Status.prototype.create = function() {
 
   this.wm = new Kru.helpers.WindowManager(this);
 
-  var actor = this.actor();
-
   // Top Window: stats
-  var statusWin = this.wm.addWindow({
+  let statusWin = this.wm.addWindow({
       width: 1,
       height: 0.75,
       type: 'statuswindow'
@@ -253,7 +284,7 @@ Scene_Status.prototype.create = function() {
   statusWin.window.activate();
 
   // Bottom Window: skill details.
-  var infoWindow = this.wm.addWindow({
+  let infoWindow = this.wm.addWindow({
     width: 1,
     height: .25,
     type: 'help',
@@ -261,7 +292,7 @@ Scene_Status.prototype.create = function() {
     setItem: function(item) {
       this.contents.clear();
 
-      var content = '';
+      let content = '';
       if(item) {
         content = item.description;
       }
