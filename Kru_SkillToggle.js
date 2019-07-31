@@ -124,11 +124,12 @@ Game_BattlerBase.prototype.initialize = function() {
   Kru.STog.Game_BattlerBase___initialize.call(this);
   this.resetReserve();
   this._stskills = this._stskills || [];
-  this.mtp = 100;
+  this._mtp = this._mtp || 100;
+  this._tp = this._tp || 0;
 }
 
 Game_BattlerBase.prototype.maxTp = function() {
-  return this.mtp;
+  return this._mtp;
 }
 
 Game_Battler.prototype.resetReserve = function() {
