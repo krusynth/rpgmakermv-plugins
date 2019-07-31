@@ -154,7 +154,6 @@ if(!Kru.AS.Parameters['Default Level Increase']) {
   // Disable the level increase and reset back to base.
   Kru.AS.Game_Actor_paramBase = Game_Actor.prototype.paramBase;
   Game_Actor.prototype.paramBase = function(paramId) {
-    console.log('class', paramId, this.currentClass());
     return this.currentClass().params[paramId][1];
   };
 }
@@ -205,7 +204,6 @@ Kru_StatusWindow.prototype.getItemLocation = function(item, i) {
 }
 
 Kru_StatusWindow.prototype.getParams = function() {
-  console.log('getParams');
   let params = Kru.AS.Params;
 
   return params;
