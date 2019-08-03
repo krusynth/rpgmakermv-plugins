@@ -98,7 +98,6 @@ Kru.AS = {
 };
 
 Kru.AS.Parameters = PluginManager.parameters('Kru_AssignStats');
-Kru.AS.Parameters['Stat Points'] = Number(Kru.AS.Parameters['Stat Points']);
 Kru.AS.Parameters['Initial Points'] = Number(Kru.AS.Parameters['Initial Points']);
 Kru.AS.Parameters['Cost Per Stat'] = Number(Kru.AS.Parameters['Cost Per Stat']);
 Kru.AS.Parameters['Default Level Increase'] = (
@@ -137,7 +136,12 @@ Game_Actor.prototype.setup = function (actorId) {
 Kru.AS.Game_Actor_levelUp = Game_Actor.prototype.levelUp;
 Game_Actor.prototype.levelUp = function () {
   Kru.AS.Game_Actor_levelUp.call(this);
-  this._statPoints += Kru.AS.Parameters['Stat Points'];
+  let points = 0;
+  let value = eval(Kru.AS.Parameters['Stat Points']);
+  if(Number.isInteger(value)) {
+    points += value;
+  }
+  this._statPoints += points;
 };
 
 
