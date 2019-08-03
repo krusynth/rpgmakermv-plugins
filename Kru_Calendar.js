@@ -1,6 +1,6 @@
 //=============================================================================
 // Calendar
-// Version: 1.0.0
+// Version: 1.0.1
 //=============================================================================
 /*:
  * @plugindesc Calendar system
@@ -50,6 +50,17 @@
  *
  * // Create a repeating event that only happens three times.
  * KruAddEvent('Weekly Message', 1, '$gameMessage.add("Week!")', 'weekly', 3);
+ *
+ *
+ * To check if the current day is a particular day, you can use the test
+ * commands in your event conditionals. These return true or false if the today
+ * matches the day in question.
+ *
+ * KruTestDay(12, 'Bloom') // Tests for a specific day of the month.
+ *
+ * KruTestMonth('Summer') // Tests just the month.
+ *
+ * KruTestYear(0) // Tests just the year. Note that the first year is year 0.
  *
  * @param Variable
  * @info Variable to use to store days that have passed.
@@ -115,22 +126,31 @@ for(let i = 0; i < Kru.Cal.params.Months.length; i++) {
 function KruShowDate(fmt, days) {
   let text = fmt || Kru.Cal.params['Format'];
 
+  let date = Kru.Cal.getDate(days);
+
+  text = text.replace('%Y', date.year)
+    .replace('%M', date.month)
+    .replace('%d', date.day)
+    .replace('%N', date.days);
+
+  return text;
+}
+
+Kru.Cal.getDate = function(days) {
   days = days ||
     ($gameVariables._data[Kru.Cal.params.Variable] + Kru.Cal.params.OffsetDays);
 
-  let year = Math.floor(days / Kru.Cal.params.DaysInYear)
+  let date = {}
+  date.days = days;
+
+  date.year = Math.floor(days / Kru.Cal.params.DaysInYear)
     + Kru.Cal.params['OffsetYears'];
 
   let monthDay = Kru.Cal.dateToMonthDay(days);
-  let month = monthDay[0];
-  let day = monthDay[1];
+  date.month = monthDay[0].Name;
+  date.day = monthDay[1];
 
-  text = text.replace('%Y', year)
-    .replace('%M', month.Name)
-    .replace('%d', day)
-    .replace('%N', days);
-
-  return text;
+  return date;
 }
 
 Kru.Cal.dateToMonthDay = function(days) {
@@ -233,5 +253,25 @@ function KruAddUpcomingEvent(name, daysFromNow, script) {
 
 function KruRemoveEvent(name) {
   $gameSystem.removeEvent(name);
+}
+
+// Day test conditional helpers
+
+// Tests for a specific day of the month.
+function KruTestDay(day, month) {
+  let date = Kru.Cal.getDate();
+  return (date.day == day && date.month == month);
+}
+
+ // Tests just the month.
+function KruTestMonth(month) {
+  let date = Kru.Cal.getDate();
+  return (date.month == month);
+}
+
+ // Tests just the year.
+function KruTestYear(year) {
+  let date = Kru.Cal.getDate();
+  return (date.year == year);
 }
 
