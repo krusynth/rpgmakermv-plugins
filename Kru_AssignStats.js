@@ -1,6 +1,6 @@
 //=============================================================================
 // Assign Stats
-// Version: 1.0.0
+// Version: 1.0.1
 //=============================================================================
 /*:
  * @plugindesc v1.0.0 Allow players to assign stat points.
@@ -57,42 +57,56 @@ Kru.AS = {
       value: function(actor) { return actor.param(this.id); },
       description: 'ATtacK power',
       param: 'atk',
-      id: 2
+      id: 2,
+      assignable: true
     },
     {
       name: function() { return TextManager.param(this.id); },
       value: function(actor) { return actor.param(this.id); },
       description: 'DEFense power',
       param: 'def',
-      id: 3
+      id: 3,
+      assignable: true
     },
     {
       name: function() { return TextManager.param(this.id); },
       value: function(actor) { return actor.param(this.id); },
       description: 'Magic ATtack power',
       param: 'mat',
-      id: 4
+      id: 4,
+      assignable: true
     },
     {
       name: function() { return TextManager.param(this.id); },
       value: function(actor) { return actor.param(this.id); },
       description: 'Magic DeFense power',
       param: 'mdf',
-      id: 5
+      id: 5,
+      assignable: true
     },
     {
       name: function() { return TextManager.param(this.id); },
       value: function(actor) { return actor.param(this.id); },
       description: 'AGIlity',
       param: 'agi',
-      id: 6
+      id: 6,
+      assignable: true
     },
     {
       name: function() { return TextManager.param(this.id); },
       value: function(actor) { return actor.param(this.id); },
       description: 'LUcK',
       param: 'luk',
-      id: 7
+      id: 7,
+      assignable: true
+    },
+    {
+      name: "Max HP",
+      value: function(actor) { return actor.mhp; }
+    },
+    {
+      name: "Max MP",
+      value: function(actor) { return actor.mmp; }
     }
   ]
 };
@@ -132,9 +146,15 @@ Game_Actor.prototype.setup = function (actorId) {
   }
 };
 
+Game_Actor.prototype.snapshot = function() {
+  return JSON.parse(JSON.stringify(this));
+}
+
 // Level up
 Kru.AS.Game_Actor_levelUp = Game_Actor.prototype.levelUp;
 Game_Actor.prototype.levelUp = function () {
+  let before = this.snapshot();
+
   Kru.AS.Game_Actor_levelUp.call(this);
   let points = 0;
   let value = eval(Kru.AS.Parameters['Stat Points']);
@@ -142,8 +162,16 @@ Game_Actor.prototype.levelUp = function () {
     points += value;
   }
   this._statPoints += points;
+  this.statLevelUp(before);
 };
 
+Game_Actor.prototype.statLevelUp = function(before) {
+  for(let i = 0; i < Kru.AS.Stats.length; i++) {
+    if(Kru.AS.Stats[i].update) {
+      Kru.AS.Stats[i].update(before, this);
+    }
+  }
+}
 
 Game_Actor.prototype.statPointCost = function(paramId) {
   if(typeof(this._statPointCostAmount[paramId]) != 'undefined') {
@@ -198,17 +226,21 @@ Kru_StatusWindow.prototype.initialize = function(win) {
 };
 
 Kru_StatusWindow.prototype.getItemLocation = function(item, i) {
-  let lineHeight = this.lineHeight();
   // TODO: Fix placement.
   let y = 50;
   let x = 10;
-  let y2 = y + lineHeight * i + this.margin * 2;
+  let y2 = y + this.lineHeight() * i + this.margin * 2;
 
   return [x, y2];
 }
 
 Kru_StatusWindow.prototype.getParams = function() {
-  let params = Kru.AS.Params;
+  let params = [];
+  for(let i = 0; i < Kru.AS.Stats.length; i++) {
+    if(Kru.AS.Stats[i].assignable) {
+      params.push(Kru.AS.Stats[i]);
+    }
+  }
 
   return params;
 };
@@ -221,12 +253,32 @@ Kru_StatusWindow.prototype.drawItem = function(index) {
 };
 
 Kru_StatusWindow.prototype.drawHeader = function () {
-  // Arbitrarily set this in the top left corner.
+  // Character's name goes in the top left corner.
   this.contents.drawText(this.actor._name, 0, 10, 250, 10, 'left');
+
+  // Class goes on the right.
   this.changeTextColor(this.systemColor());
-  this.contents.drawText($dataClasses[this.actor._classId].name, 350, 10, 250, 10, 'right');
+  this.contents.drawText($dataClasses[this.actor._classId].name, 670, 10, 250, 10, 'right');
   this.resetTextColor();
+
+  this.drawPassives();
 };
+
+Kru_StatusWindow.prototype.drawPassives = function() {
+  // List our passive attributes on the right.
+
+  // TODO: Fix placement.
+  let y2 = 50 + this.margin * 2;
+  let x = 520;
+
+  for(let i = 0; i < Kru.AS.Stats.length; i++) {
+    if(!Kru.AS.Stats[i].assignable) {
+      let param = Kru.AS.Stats[i];
+      this.contents.drawText(param.name + ':' + param.value(this.actor), x, y2, 250, 10, 'left');
+      y2 += this.lineHeight() + this.margin * 2;
+    }
+  }
+}
 
 Kru_StatusWindow.prototype.drawFooter = function() {
   let content = String(this.actor._statPoints) + ' Pts';
@@ -243,8 +295,13 @@ Kru_StatusWindow.prototype.onOk = function() {
     return this.failState();
   }
 
+  let before = this.actor.snapshot();
+
   this.addStatPoint(stat.id, 1);
   this.actor._statPoints -= statCost;
+
+  this.actor.statLevelUp(before);
+
   this.refresh();
   this.activate();
 };
