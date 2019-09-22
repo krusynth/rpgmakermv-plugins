@@ -7,6 +7,11 @@ credit to use these plugins in your game.
 
 The following plugins are available in this repo:
 
+## [Variable Text](Kru_VariableText.js)
+Replaces text in your game with a value defined in a JSON file. This allows you
+to set names of towns, people, etc. in one place and re-use the variable
+everywhere.
+
 ## [Clear Map Photos](Kru_ClearMapPhotos.js)
 Automatically clears all previously loaded photos whenever a map is loaded. This
 makes it easier to have parallax photos on your maps as they'll automatically be
