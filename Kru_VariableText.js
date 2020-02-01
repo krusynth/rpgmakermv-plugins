@@ -1,9 +1,9 @@
 //=============================================================================
 // Variable Text
-// Version: 1.0.1
+// Version: 1.0.2
 //=============================================================================
 /*:
- * @plugindesc v1.0.0 Replace text using a datafile.
+ * @plugindesc v1.0.2 Replace text using a datafile.
  *
  * @author Krues8dr
  *
@@ -37,10 +37,10 @@ Imported.Kru_VariableText = "1.0.0";
 
 var Kru = Kru || {};
 Kru.VT = {};
-Kru.AS.Parameters = PluginManager.parameters('Kru_VariableText');
+Kru.VT.Parameters = PluginManager.parameters('Kru_VariableText');
 
 Kru.VT.init = function() {
-  DataManager.loadDataFile('kruVariableText', Kru.AS.Parameters.Datafile+'.json');
+  DataManager.loadDataFile('kruVariableText', Kru.VT.Parameters.Datafile+'.json');
 }
 Kru.VT.init();
 
