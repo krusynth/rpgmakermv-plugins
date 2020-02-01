@@ -83,3 +83,29 @@ This plugin makes it easier to deploy multiple games on a single webserver, by
 allowing each instance to share the core game assets. It also allows you to
 specify a custom html container element for the game to load in, so that you
 can create a wrapper frame around the game. [demo](https://games.krues8dr.com/demo/Kru_Reputation/)
+
+## [Load Image Types](Kru_LoadImageTypes.js)
+This plugin allows for image types other than PNGs to be loaded for most uses.
+The default behavior for any files without an extension will remain the RPG
+Maker MV default to automatically add ".png" to the end before looking for the
+image. However, any files that include an extension will be loaded as-is.
+
+# Patches for other authors' plugins
+
+## [Extra Movement Frames Patch](Kru_ExtraMovementFramesPatch.js)
+his plugin extends [Modern Algebra's Extra Movement Frames](http://rmrk.net/index.php?topic=50452.0)
+to fix an issue with the default filename pattern, which breaks on the web due
+to the use of the `%` character.  Allows users to set their own regex patterns.
+
+## [SRD FaceImages](Kru_SRD_FaceImages.js)
+This is a very tiny plugin that overrides the bust images of
+[SRD_AltMenuScreen_BustIcons.js](http://sumrndm.site/ams-busts-icons/) to use
+the builtin RPG Maker MV standard face images instead.
+
+## [User Swap](Kru_UserSwap.js)
+This plugin extends [Hime's Party Manager](http://himeworks.com/2016/02/party-manager-mv/)
+to automatically swap parties on map load.  Simply add a Note to the map such as
+`<party:2>` and that party will automatically be selected on map load. This also
+adds an event handler when the Party is changed. This allows you to set values
+on each swap.  For instance, you can create an event and run a custom script to
+turn Stepping on and off when that party loads.
