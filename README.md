@@ -97,12 +97,12 @@ his plugin extends [Modern Algebra's Extra Movement Frames](http://rmrk.net/inde
 to fix an issue with the default filename pattern, which breaks on the web due
 to the use of the `%` character.  Allows users to set their own regex patterns.
 
-## [SRD FaceImages](Kru_SRD_FaceImages.js)
+## [SRD FaceImages Patch](Kru_SRD_FaceImages.js)
 This is a very tiny plugin that overrides the bust images of
 [SRD_AltMenuScreen_BustIcons.js](http://sumrndm.site/ams-busts-icons/) to use
 the builtin RPG Maker MV standard face images instead.
 
-## [User Swap](Kru_UserSwap.js)
+## [Hime User Swap Patch](Kru_UserSwap.js)
 This plugin extends [Hime's Party Manager](http://himeworks.com/2016/02/party-manager-mv/)
 to automatically swap parties on map load.  Simply add a Note to the map such as
 `<party:2>` and that party will automatically be selected on map load. This also
