@@ -90,19 +90,19 @@ The default behavior for any files without an extension will remain the RPG
 Maker MV default to automatically add ".png" to the end before looking for the
 image. However, any files that include an extension will be loaded as-is.
 
-# Patches for other authors' plugins
+# Additions for other authors' plugins
 
-## [Extra Movement Frames Patch](Kru_ExtraMovementFramesPatch.js)
-his plugin extends [Modern Algebra's Extra Movement Frames](http://rmrk.net/index.php?topic=50452.0)
+## [Modern Algebra Extra Movement Frames](Kru_ExtraMovementFramesPatch.js)
+This plugin extends [Modern Algebra's Extra Movement Frames](http://rmrk.net/index.php?topic=50452.0)
 to fix an issue with the default filename pattern, which breaks on the web due
 to the use of the `%` character.  Allows users to set their own regex patterns.
 
-## [SRD FaceImages Patch](Kru_SRD_FaceImages.js)
+## [SumRndmDde FaceImages](Kru_SRD_FaceImages.js)
 This is a very tiny plugin that overrides the bust images of
 [SRD_AltMenuScreen_BustIcons.js](http://sumrndm.site/ams-busts-icons/) to use
-the builtin RPG Maker MV standard face images instead.
+the built-in RPG Maker MV standard face images instead.
 
-## [Hime User Swap Patch](Kru_UserSwap.js)
+## [Hime User Swap](Kru_UserSwap.js)
 This plugin extends [Hime's Party Manager](http://himeworks.com/2016/02/party-manager-mv/)
 to automatically swap parties on map load.  Simply add a Note to the map such as
 `<party:2>` and that party will automatically be selected on map load. This also
