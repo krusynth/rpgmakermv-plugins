@@ -109,3 +109,24 @@ to automatically swap parties on map load.  Simply add a Note to the map such as
 adds an event handler when the Party is changed. This allows you to set values
 on each swap.  For instance, you can create an event and run a custom script to
 turn Stepping on and off when that party loads.
+
+## [Battle Movement Frames](Kru_BattleMovementFrames.js)
+*work in progress*
+
+Adds movement frames to an enemy sprite in battle. This doesn't handle attacks
+or anything complicated - you're better off using
+[Yanfly's Animated Sideview Enemies](http://www.yanfly.moe/wiki/Animated_Sideview_Enemies_%28YEP%29)
+if you're looking for that sort of animation. *Requires Kru Core.*
+
+## [Load Map Events](Kru_MapLoadEvents.js)
+Runs your own custom javascript when changing between maps.
+
+## [Pipe Minigame](Kru_PipeMinigame.js)
+*work in progress*
+
+A small minigame where the player must connect a series of pipes. This plugin is
+currently under development, but works. There is no time limit or other
+restrictions currently. *Requires Kru Core.*
+
+## [Previous Position](Kru_PreviousPosition.js)
+Remember a location and transfer the player back to that location.

@@ -1,6 +1,6 @@
 //=============================================================================
 // Krues8dr Core
-// Version: 1.0.1
+// Version: 1.0.2
 //=============================================================================
 /*:
  * @plugindesc Shared base for many Krues8dr plugins
@@ -20,7 +20,7 @@
  */
 
 var Imported = Imported || {};
-Imported.Kru_Core = "1.0.0";
+Imported.Kru_Core = "1.0.2";
 
 var Kru = Kru || {};
 Kru.Core = {
@@ -116,14 +116,14 @@ Kru.helpers.eventCallback = function(name, object) {
 Kru.helpers.DataManager_extractMetadata = DataManager.extractMetadata
 DataManager.extractMetadata = function(data) {
   let note = data.note;
+  let tmp = note;
   if(typeof data.meta == 'undefined') {
     data.meta = {};
   }
-
   // First pass: tags.
-  let re = /<([^<>:]+)(:?)([^>]*)>/g;
+  let re = /<([^<>:]+)(:?)([^>]*)>/gm;
   while(true) {
-    let match = re.exec(note);
+    let match = re.exec(tmp);
     if (match) {
       if (match[2] === ':') {
         data.meta[match[1]] = match[3];
@@ -144,9 +144,12 @@ DataManager.extractMetadata = function(data) {
       Object.assign(data.meta, tmpData);
     } catch(e) {};
   }
+
+
 }
 
 // Parse tags into an object
+// TODO: fold into extractMetadata;
 Kru.helpers.parseNoteTags = function(note) {
   if(typeof(note) == 'string' && note.length > 0) {
     let data = {};
@@ -249,45 +252,41 @@ Kru.helpers.WindowManager = function (scene) {
     _w: 0,
     _h: 0
   };
-  this.windows = [];
+  this.windows = {};
 
-  this.addWindow = function(win) {
-    win._w = Graphics.boxWidth * win.width;
-    win._h = Graphics.boxHeight * win.height;
+  this.addWindow = function(options) {
+    options._w = options._w || Graphics.boxWidth * options.width;
+    options._h = options._h || Graphics.boxHeight * options.height;
 
     // By default, put this next to the previous item.
-    if(typeof(win._x) == 'undefined' && typeof(win._y) == 'undefined') {
-      win._x = this.last._x + this.last._w;
-      win._y = this.last._y;
+    if(typeof(options._x) == 'undefined' && typeof(options._y) == 'undefined') {
+      options._x = this.last._x + this.last._w;
+      options._y = this.last._y;
 
       // If this won't fit next to the previous item, move it to the next row.
-      if(win._x + win._w > Graphics.boxWidth) {
-        win._x = 0;
-        win._y = this.last._y + this.last._h;
+      if(options._x + options._w > Graphics.boxWidth) {
+        options._x = 0;
+        options._y = this.last._y + this.last._h;
       }
     }
 
-    win.scene = this.scene;
-    win.actor = this.scene.actor();
+    options.scene = this.scene;
+    options.actor = this.scene.actor();
+    options.manager = this;
 
-    if(Kru.helpers.windowHandlers[win.type]) {
-      win.window = new Kru.helpers.windowHandlers[win.type](win);
-    }
-    else {
-      win.window = new Kru.helpers.windowHandlers['default'](win);
-    }
+    let type = options.type || 'default';
 
-    win.window.open();
-    win.window.show();
+    let win = new Kru.helpers.windowHandlers[type](options);
 
-    this.windows.push(win);
+    win.open();
+    win.show();
+
+    let key = win.name || Object.keys(this.windows).length;
+
+    this.windows[key] = win;
     this.last = win;
 
-    if(!win.window._handlers) {
-      win.window._handlers = {};
-    }
-
-    this.scene.addWindow(win.window);
+    this.scene.addWindow(win);
 
     return win;
   }
@@ -310,10 +309,11 @@ Kru.helpers.WindowManager.prototype.text = function() {};
  */
 
 function Kru_WindowMixin() {
-  this._iconSet = 'IconSet';
+  this._iconSet = this._iconSet || 'IconSet';
   this._iconWidth = Window_Base._iconWidth;
   this._iconHeight = Window_Base._iconHeight;
   this._lineHeight = 36;
+  this._handlers = {};
 
   this.iconInit = function(win) {
     if(win.icon) {
@@ -333,25 +333,51 @@ function Kru_WindowMixin() {
   };
 
   this.loadIcons = function(name) {
-    this.bitmap = ImageManager.loadSystem(name);
+    name = name || this._iconSet;
+
+    if(!this.bitmap) {
+      this.bitmap = ImageManager.loadSystem(name);
+      let wait = true;
+      return new Promise(resolve => {
+        this.bitmap.addLoadListener(() => {
+          resolve();
+        });
+      });
+    }
   };
 
-  this.drawIcon = function(iconIndex, x, y, set) {
+  this.drawIcon = async function(iconIndex, x, y, set) {
     if(!this.bitmap) {
       if(!set) {
         set = this._iconSet;
       }
-      this.loadIcons(set);
+      await this.loadIcons(set);
     }
 
     let cols = Math.round(this.bitmap.width / this._iconWidth);
-
     let pw = this._iconWidth;
     let ph = this._iconHeight;
     let sx = iconIndex % cols * pw;
     let sy = Math.floor(iconIndex / cols) * ph;
+
     this.contents.blt(this.bitmap, sx, sy, pw, ph, x, y);
   };
+
+  // We use a modified drawIcon which doesn't need to wait for the image to be loaded.
+  // In this instance you'll need to call loadIcons manually.
+  this.drawIconIndex = async function(idx, idy, x, y, rotate) {
+    await this.loadIcons();
+
+    let sx = idx * this._iconWidth;
+    let sy = idy * this._iconHeight;
+
+    if(rotate) {
+      this.contents.bltRotate(this.bitmap, sx, sy, this._iconWidth, this._iconHeight, x, y, rotate);
+    }
+    else {
+      this.contents.blt(this.bitmap, sx, sy, this._iconWidth, this._iconHeight, x, y);
+    }
+  }
 
   this.drawItemName = function(item, x, y, width) {
     width = width || 312;
@@ -367,8 +393,14 @@ function Kru_WindowMixin() {
     return this._lineHeight;
   };
 
+  Object.defineProperty(this, '_x', { get: function () { return this._win._x } });
+  Object.defineProperty(this, '_y', { get: function () { return this._win._y } });
+  Object.defineProperty(this, '_w', { get: function () { return this._win._w } });
+  Object.defineProperty(this, '_h', { get: function () { return this._win._h } });
+
   return this;
 }
+
 
 /*
  * Override the Base window to take an object with all of the properties we need.
@@ -406,13 +438,17 @@ Kru_GenericListWindow.prototype.constructor = Window_Selectable;
 
 Kru_GenericListWindow.prototype.initialize = function(win) {
   this._win = win;
-  this._data = win.content;
+  if(win.content) {
+    this._data = win.content;
+  }
 
   if(this._data && this._data.length) {
     this._index = 0;
   }
 
   this.iconInit(win);
+
+  Object.defineProperty(this, 'current', { get: function() { return this._data[this._index]; }});
 
   Window_Selectable.prototype.initialize.call(this, win._x, win._y, win._w, win._h);
   this.refresh();
@@ -769,6 +805,33 @@ Bitmap.prototype.kDrawPolygon = function(points, line, fill) {
   context.globalAlpha = 1;
 }
 
+/*
+ * Add rotation to Bitmap.
+ * Original: https://forums.rpgmakerweb.com/index.php?threads/how-to-rotate-bitmap.48225/#post-502863
+ */
+
+if(!Bitmap.prototype.bltRotate) {
+  Bitmap.prototype.bltRotate = function(source, sx, sy, sw, sh, dx, dy, angle, dw, dh) {
+    angle = angle || 0;
+    dw = dw || sw;
+    dh = dh || sh;
+    if (sx >= 0 && sy >= 0 && sw > 0 && sh > 0 && dw > 0 && dh > 0 &&
+      sx + sw <= source.width && sy + sh <= source.height
+    ) {
+      this._context.globalCompositeOperation = 'source-over';
+      const offsetX = dx + dw/2;
+      const offsetY = dy + dh/2;
+      this._context.translate(offsetX, offsetY);
+      this._context.rotate(angle * Math.PI / 180);
+      this._context.translate(-offsetX, -offsetY);
+      this._context.drawImage(source._canvas, sx, sy, sw, sh, dx, dy, dw, dh);
+      this._context.setTransform(1, 0, 0, 1, 0, 0);
+      this._setDirty();
+    }
+  };
+}
+
+
 
 // Function to debug any sounds when we don't want to run sounds.
 // Usage: open the console and run DebugSound();
@@ -853,4 +916,22 @@ DebugSound = function() {
   };
 
   SoundManager = this;
+}
+
+/* Scene Tests */
+function isScene(name) {
+  return SceneManager._scene instanceof name;
+}
+
+function isSceneDeep(name) {
+  let result = isScene(name);
+  if(!result) {
+    for(let i = 0; i < SceneManager._stack.length; i++) {
+      let temp = new SceneManager._stack[i];
+      result = result || temp instanceof name;
+      delete temp;
+      if(result) break;
+    }
+  }
+  return result;
 }

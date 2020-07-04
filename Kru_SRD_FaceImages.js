@@ -14,6 +14,6 @@ Window_MenuStatus.prototype.drawBust = function(actor, rect, xOff, yOff) {
     // var sx = bitmap.width / 2 - this.itemWidth() / 2;
     // this.contents.blt(bitmap, sx, sy,   sw,               sh,             dx,           dy);
     // this.contents.blt(bitmap, sx, 0, this.itemWidth(), bitmap.height, rect.x + xOff, (rect.height - bitmap.height) + yOff);
-    this.drawFace(actor.faceName(), actor.faceIndex(), xOff, yOff-80, this.itemWidth(), rect.height);
+    this.drawFace(actor.faceName(), actor.faceIndex(), rect.x + xOff, yOff-80, this.itemWidth(), rect.height);
     // console.log('drawBust', actor.faceName(), actor.faceIndex(), xOff, yOff, this.itemWidth(), rect.height);
 };
