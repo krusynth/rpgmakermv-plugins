@@ -128,5 +128,9 @@ A small minigame where the player must connect a series of pipes. This plugin is
 currently under development, but works. There is no time limit or other
 restrictions currently. *Requires Kru Core.*
 
+To use this, you'll need to create an image for the tiles of the game. You can
+use [this image](https://raw.githubusercontent.com/wiki/krusynth/rpgmakermv-plugins/img/Kru_PipeMinigame/pipetiles.png)
+or use it as a template.
+
 ## [Previous Position](Kru_PreviousPosition.js)
 Remember a location and transfer the player back to that location.

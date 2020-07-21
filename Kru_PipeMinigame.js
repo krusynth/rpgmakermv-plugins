@@ -1,7 +1,7 @@
 /*:
  * Pipe Minigame
  *
- * @plugindesc 1.0 Creates a pipe minigame.
+ * @plugindesc 1.1 Creates a pipe minigame.
  *
  * @author Krusynth (https://billhunt.dev)
  *
@@ -19,6 +19,9 @@
  * succeeded. This is customizable in the paramters, defaults to
  * $gameTemp['kru_pipegame'];
  *
+ * Important: you'll need to create a tiles image for the game, Please see the
+ * example file here: https://raw.githubusercontent.com/wiki/krusynth/rpgmakermv-plugins/img/Kru_PipeMinigame/pipetiles.png
+ *
  * @param Title
  * @default Pipe Game
  * @desc Title of the window
@@ -26,10 +29,22 @@
  * @param Variable
  * @default kru_pipegame
  * @desc The key to store the result of the minigame within $gameTemp
+ *
+ * @param Icons
+ * @desc Name of the tiles image to use, in img/system, without the file extension.
+ * @type file
+ * @default pipetiles
+ * @dir img/system
+ *
+ * @param Icon Size
+ * @parent Icons
+ * @type number
+ * @desc Size of the icons to use. It's not recommended to change this.
+ * @default 72
  */
 
 var Imported = Imported || {};
-Imported.Kru_PipeMinigame = 1.0;
+Imported.Kru_PipeMinigame = 1.1;
 
 var Kru = Kru || {};
 Kru.PM = {
@@ -37,12 +52,12 @@ Kru.PM = {
 };
 
 Kru.PM.params = PluginManager.parameters('Kru_PipeMinigame');
+Kru.PM.params['Icon Size'] = parseInt(Kru.PM.params['Icon Size']);
 
 if(!Imported.Kru_Core) {
   alert('Kru_PipeMinigame requires Kru_Core.');
   throw new Error('Kru_PipeMinigame requires Kru_Core.');
 }
-
 
 function pipeminigame(args) {
   args = args || {};
@@ -55,9 +70,9 @@ class Scene_PipeMinigame extends Scene_MenuBase {
   async initialize(args) {
     args = args || {};
     this.icon = args.icon || {
-      width: 72,
-      height: 72,
-      set: 'pipetiles'
+      set: Kru.PM.params['Icons'],
+      width: Kru.PM.params['Icon Size'],
+      height: Kru.PM.params['Icon Size']
     };
     this.args = args;
 
@@ -92,7 +107,7 @@ class Scene_PipeMinigame extends Scene_MenuBase {
     const titleWindow = wm.addWindow({
       width: 1,
       height: .12,
-      content: 'Hacking'
+      content: Kru.PM.params['Title']
     });
 
     const pieceWindow = wm.addWindow({
@@ -145,7 +160,6 @@ class Scene_PipeMinigame extends Scene_MenuBase {
  * Create a window to show our available pieces.
  */
 class Kru_PipeGame_PieceListWindow extends Kru_GenericListWindow {
-  grid = null;
 
   initialize(win) {
     this.pieces = win.pieces || 1;
@@ -188,7 +202,7 @@ class Kru_PipeGame_PieceListWindow extends Kru_GenericListWindow {
 
   getPiece() {
     let value = Math.floor(Math.random() * this._maxFrequency);
-    value = 12; // TEST
+
     let keys = Object.keys(this._frequency);
     let piece = null;
 
@@ -495,11 +509,13 @@ class Kru_PipeGame_GridWindow extends Kru_GenericListWindow {
       }
 
 
-      if(this.pieceWindow.pieces > 1) {
+      if(this.pieceWindow.pieces > 1 || this.pieceWindow.rotate) {
         this.deactivate();
         this.pieceWindow.activate();
       }
-
+      else {
+        this.activate();
+      }
     }
     else {
       this.playBuzzerSound();
@@ -572,18 +588,20 @@ Kru.helpers.windowHandlers['gamegrid'] = Kru_PipeGame_GridWindow;
 
 Kru.PM.pieces = {};
 class Piece {
-  direction = 0;
-  index = null;
-  dim = [null, null];
-  //   0
-  // 3   1
-  //   2
-  connections = [];
-
-  active = false;
-  _img = null;
 
   constructor(options) {
+    this.direction = 0;
+    this.index = null;
+    this.dim = [null, null];
+    //   0
+    // 3   1
+    //   2
+    // this.connections = [];
+    // this._img = null;
+
+    this.active = false;
+
+
     for(name in options) {
       this[name] = options[name];
     }
@@ -712,29 +730,41 @@ class Piece {
 }
 
 class PieceX extends Piece {
-  name = 'X';
-  _img = 2;
-  connections = [true, true, true, true];
+  constructor() {
+    super();
+    this.name = 'X';
+    this._img = 2;
+    this.connections = [true, true, true, true];
+  }
 }
 Kru.PM.pieces['PieceX'] = PieceX;
 
 class PieceT extends Piece {
-  name = 'T';
-  _img = 3;
-  connections = [true, true, false, true];
+  constructor() {
+    super();
+    this.name = 'T';
+    this._img = 3;
+    this.connections = [true, true, false, true];
+  }
 }
 Kru.PM.pieces['PieceT'] = PieceT;
 
 class PieceI extends Piece {
-  name = 'I';
-  _img = 0;
-  connections = [true, false, true, false]
+  constructor() {
+    super();
+    this.name = 'I';
+    this._img = 0;
+    this.connections = [true, false, true, false]
+  }
 }
 Kru.PM.pieces['PieceI'] = PieceI;
 
 class PieceL extends Piece {
-  name = 'L';
-  _img = 1;
-  connections = [true, true, false, false]
+  constructor() {
+    super();
+    this.name = 'L';
+    this._img = 1;
+    this.connections = [true, true, false, false]
+  }
 }
 Kru.PM.pieces['PieceL'] = PieceL;
