@@ -3,7 +3,7 @@
 // Version: 1.0.1
 //=============================================================================
 /*:
- * @plugindesc v1.0.0 Allow players to assign stat points.
+ * @plugindesc v1.0.1 Allow players to assign stat points.
  *
  * @author Krues8dr
  *
@@ -197,124 +197,123 @@ function Scene_Status() {
 Scene_Status.prototype = Object.create(Scene_MenuBase.prototype);
 
 /* Skill Tree Window */
-function Kru_StatusWindow() {
-  this.initialize.apply(this, arguments);
-};
+class Kru_StatusWindow extends Kru_CustomListWindow {
+  initialize(win) {
+    super.initialize(win);
 
-Kru_StatusWindow.prototype = Object.create(Kru_CustomListWindow.prototype);
+    let lineHeight = this.lineHeight();
 
-Kru_StatusWindow.prototype.initialize = function(win) {
-  Kru_CustomListWindow.prototype.initialize.call(this, win);
+    let params = this.getParams();
 
-  let lineHeight = this.lineHeight();
+    for (let i = 0; i < params.length; i++) {
+      let item = params[i];
+      item.description = item.description || '';
+      item.location = item.location || this.getItemLocation(item, i);
+      item.width = item.width || 200;
+      item.height = item.height || (lineHeight + this.margin);
 
-  let params = this.getParams();
-
-  for (let i = 0; i < params.length; i++) {
-    let item = params[i];
-    item.description = item.description || '';
-    item.location = item.location || this.getItemLocation(item, i);
-    item.width = item.width || 200;
-    item.height = item.height || (lineHeight + this.margin);
-
-    this._data.push(item);
-  }
-
-  this.refresh();
-
-  this.select(0);
-};
-
-Kru_StatusWindow.prototype.getItemLocation = function(item, i) {
-  // TODO: Fix placement.
-  let y = 50;
-  let x = 10;
-  let y2 = y + this.lineHeight() * i + this.margin * 2;
-
-  return [x, y2];
-}
-
-Kru_StatusWindow.prototype.getParams = function() {
-  let params = [];
-  for(let i = 0; i < Kru.AS.Stats.length; i++) {
-    if(Kru.AS.Stats[i].assignable) {
-      params.push(Kru.AS.Stats[i]);
+      this._data.push(item);
     }
+
+    this.refresh();
+
+    this.select(0);
   }
 
-  return params;
-};
+  getItemLocation(item, i) {
+    // TODO: Fix placement.
+    let y = 50;
+    let x = 10;
+    let y2 = y + this.lineHeight() * i + this.margin * 2;
 
-Kru_StatusWindow.prototype.drawItem = function(index) {
-  let content = this._data[index];
-  let name = typeof content.name === 'function' ? content.name() : content.name;
-  this.drawText(name, content.location[0], content.location[1], content.width - this.margin, 'left');
-  this.drawText(content.value(this.actor), content.location[0], content.location[1], content.width - this.margin, 'right');
-};
+    return [x, y2];
+  }
 
-Kru_StatusWindow.prototype.drawHeader = function () {
-  // Character's name goes in the top left corner.
-  this.contents.drawText(this.actor._name, 0, 10, 250, 10, 'left');
-
-  // Class goes on the right.
-  this.changeTextColor(this.systemColor());
-  this.contents.drawText($dataClasses[this.actor._classId].name, 670, 10, 250, 10, 'right');
-  this.resetTextColor();
-
-  this.drawPassives();
-};
-
-Kru_StatusWindow.prototype.drawPassives = function() {
-  // List our passive attributes on the right.
-
-  // TODO: Fix placement.
-  let y2 = 50 + this.margin * 2;
-  let x = 520;
-
-  for(let i = 0; i < Kru.AS.Stats.length; i++) {
-    if(!Kru.AS.Stats[i].assignable) {
-      let param = Kru.AS.Stats[i];
-      this.contents.drawText(param.name + ':' + param.value(this.actor), x, y2, 250, 10, 'left');
-      y2 += this.lineHeight() + this.margin * 2;
+  getParams() {
+    let params = [];
+    for(let i = 0; i < Kru.AS.Stats.length; i++) {
+      if(Kru.AS.Stats[i].assignable) {
+        params.push(Kru.AS.Stats[i]);
+      }
     }
+
+    return params;
+  }
+
+  drawItem(index) {
+    let content = this._data[index];
+    let name = typeof content.name === 'function' ? content.name() : content.name;
+    this.drawText(name, content.location[0], content.location[1], content.width - this.margin, 'left');
+    this.drawText(content.value(this.actor), content.location[0], content.location[1], content.width - this.margin, 'right');
+  }
+
+  drawHeader() {
+    // Character's name goes in the top left corner.
+    this.contents.drawText(this.actor._name, 0, 10, 250, 10, 'left');
+
+    // Class goes on the right.
+    this.changeTextColor(this.systemColor());
+    this.contents.drawText($dataClasses[this.actor._classId].name, 670, 10, 250, 10, 'right');
+    this.resetTextColor();
+
+    this.drawPassives();
+  }
+
+  drawPassives() {
+    // List our passive attributes on the right.
+
+    // TODO: Fix placement.
+    let y2 = 50 + this.margin * 2;
+    let x = 520;
+
+    this.contents.drawText(
+      'HP: ' + this.actor.hp + '/' + this.actor.mhp,
+      520, 75, 250, 10, 'left'
+    );
+    this.contents.drawText(
+      'MP: ' + this.actor.mp + '/' + this.actor.mmp,
+      520, 110, 250, 10, 'left'
+    );
+  }
+
+  drawFooter() {
+    let content = String(this.actor._statPoints) + ' Pts';
+    // Arbitrarily set this in the bottom right corner.
+    this.contents.drawText(content, 670, 415, 100, 10, 'right');
+  }
+
+  onOk() {
+    let stat = this._data[this.index()];
+    let statCost = this.actor.statPointCost(stat.id);
+
+    // Failure states.
+    if(this.actor._statPoints < statCost) {
+      return this.failState();
+    }
+
+    let before = this.actor.snapshot();
+
+    this.addStatPoint(stat.id, 1);
+    this.actor._statPoints -= statCost;
+
+    this.actor.statLevelUp(before);
+
+    this.refresh();
+    this.activate();
+  }
+
+  addStatPoint(id, amount) {
+    this.actor.addParam(id, amount);
   }
 }
-
-Kru_StatusWindow.prototype.drawFooter = function() {
-  let content = String(this.actor._statPoints) + ' Pts';
-  // Arbitrarily set this in the bottom right corner.
-  this.contents.drawText(content, 670, 415, 100, 10, 'right');
-};
-
-Kru_StatusWindow.prototype.onOk = function() {
-  let stat = this._data[this.index()];
-  let statCost = this.actor.statPointCost(stat.id);
-
-  // Failure states.
-  if(this.actor._statPoints < statCost) {
-    return this.failState();
-  }
-
-  let before = this.actor.snapshot();
-
-  this.addStatPoint(stat.id, 1);
-  this.actor._statPoints -= statCost;
-
-  this.actor.statLevelUp(before);
-
-  this.refresh();
-  this.activate();
-};
-
-Kru_StatusWindow.prototype.addStatPoint = function(id, amount) {
-  this.actor.addParam(id, amount);
-};
 
 // Add new window type to the Window Manager
 Kru.helpers.windowHandlers['statuswindow'] = Kru_StatusWindow;
 
 
-
+/*
+ * Replace Scene_Status
+ */
 Kru.AS.Scene_Status = Scene_Status;
 
 function Scene_Status() {
@@ -335,29 +334,22 @@ Scene_Status.prototype.create = function() {
 
   // Top Window: stats
   let statusWin = this.wm.addWindow({
+      name: 'status',
       width: 1,
       height: 0.75,
       type: 'statuswindow'
   });
 
-  statusWin.window.activate();
+  statusWin.activate();
 
   // Bottom Window: skill details.
   let infoWindow = this.wm.addWindow({
+    name: 'info',
     width: 1,
     height: .25,
     type: 'help',
-    content: '',
-    setItem: function(item) {
-      this.contents.clear();
-
-      let content = '';
-      if(item) {
-        content = item.description;
-      }
-      this.setText(content);
-    }
+    content: ''
   });
 
-  statusWin.window.setHelpWindow(infoWindow.window);
+  statusWin.setHelpWindow(infoWindow);
 };
