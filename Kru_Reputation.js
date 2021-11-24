@@ -1,9 +1,9 @@
 //=============================================================================
 // Reputation
-// Version: 1.0.0
+// Version: 1.0.1
 //=============================================================================
 /*:
- * @plugindesc v1.0.0 Reputation system
+ * @plugindesc v1.0.1 Reputation system
  *
  * @author Krusynth
  *
