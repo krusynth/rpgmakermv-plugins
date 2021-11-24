@@ -54,7 +54,7 @@
  * @parent Icons
  * @type number
  * @desc Size of the icons to use.
- * @default 16
+ * @default 32
  *
  * @param Custom Icons
  * @parent Icons
@@ -265,11 +265,16 @@ Scene_Factions.prototype.create = function(){
 
   if(Kru.RP.Parameters['Icons']) {
     winOptions['lineHeight'] = Kru.RP.Parameters['Icon Size']+4;
+
+    // The text height is 32px, so we need to bump this up if the icons are smaller.
+    if(winOptions['lineHeight'] < 32) {
+      winOptions['lineHeight'] = 32;
+    }
   }
 
   let factionWin = this.wm.addWindow(winOptions);
 
-  factionWin.window.activate();
+  factionWin.activate();
 }
 
 function Kru_FactionWindow() {
