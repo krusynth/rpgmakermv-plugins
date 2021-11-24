@@ -80,7 +80,7 @@
  */
 
 var Imported = Imported || {};
-Imported.Kru_Reputation = "1.0.0";
+Imported.Kru_Reputation = "1.0.1";
 
 var Kru = Kru || {};
 
