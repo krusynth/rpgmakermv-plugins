@@ -5,7 +5,7 @@
 /*:
  * @plugindesc Creates passive skills that can be toggled on/off.
  *
- * @author Krues8dr
+ * @author Krusynth
  *
  * @help
  * ============================================================================

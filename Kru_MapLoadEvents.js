@@ -4,7 +4,7 @@
 
 /*:
  * @plugindesc Runs scripts on map change.
- * @author Krues8dr
+ * @author Krusynth
  *
  * @help This plugin allows for custom javascript to be run on map load. Add a
  * load tag and follow it with whatever code you want to execute.

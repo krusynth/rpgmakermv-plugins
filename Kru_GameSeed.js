@@ -5,7 +5,7 @@
 /*:
  * @plugindesc v1.0.0 Creates a custom random seed for the game.
  *
- * @author Krues8dr
+ * @author Krusynth
  *
  * @param Seed Variable Name
  * @desc Select the variable that should hold the seed.

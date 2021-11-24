@@ -3,7 +3,7 @@
  *
  * @plugindesc 1.0 Allows airships to interact with events.
  *
- * @author Krues8dr (krues8dr.com)
+ * @author Krusynth
  *
  * @help
  * By default, RPG Maker MV doesn't allow airships to interact with events.

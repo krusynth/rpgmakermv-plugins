@@ -6,7 +6,7 @@
  * @plugindesc v1.0.0 Shows more characters in windows based on
  * Max Battle Members setting in Yanfly's Party System.
  *
- * @author Krues8dr
+ * @author Krusynth
  *
  * @param ---General---
  * @default

@@ -5,7 +5,7 @@
 /*:
  * @plugindesc v1.0.2 Replace text using a datafile.
  *
- * @author Krues8dr
+ * @author Krusynth
  *
  * @help
  * ============================================================================

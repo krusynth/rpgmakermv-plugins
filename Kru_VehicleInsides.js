@@ -3,7 +3,7 @@
  *
  * @plugindesc 1.0 Automatically creates vehicle insides,
  *
- * @author Krues8dr (krues8dr.com)
+ * @author Krusynth
  *
  * @help
  * This plugin allows you to easily create maps for the insides of vehicles,

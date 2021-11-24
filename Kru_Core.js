@@ -1,11 +1,11 @@
 //=============================================================================
-// Krues8dr Core
+// Kru Core
 // Version: 1.0.2
 //=============================================================================
 /*:
- * @plugindesc Shared base for many Krues8dr plugins
+ * @plugindesc Shared base for many Krusynth plugins
  *
- * @author Krues8dr
+ * @author Krusynth
  *
  * @param ---General---
  * @default
@@ -15,7 +15,7 @@
  * Information
  * ============================================================================
  *
- * This is the base include for many Krues8dr RPG Maker MV plugins. It includes
+ * This is the base include for many Krusynth RPG Maker MV plugins. It includes
  * a JSON loader and window manager.
  */
 

@@ -5,7 +5,7 @@
 /*:
  * @plugindesc Calendar system
  *
- * @author Krues8dr
+ * @author Krusynth
  *
  * @help
  * ============================================================================

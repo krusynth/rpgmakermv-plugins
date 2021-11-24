@@ -5,7 +5,7 @@
 /*:
  * @plugindesc v1.0.0 Reputation system
  *
- * @author Krues8dr
+ * @author Krusynth
  *
  * @help
  * ============================================================================

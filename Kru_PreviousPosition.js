@@ -4,7 +4,7 @@
 
 /*:
  * @plugindesc Stores the player's position and can return the player there.
- * @author Krues8dr
+ * @author Krusynth
  *
  * @help
  *

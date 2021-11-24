@@ -4,7 +4,7 @@
 
 /*:
  * @plugindesc Patches Modern Algebra's Extra Movement Frames to fix web bugs.
- * @author Krues8dr
+ * @author Krusynth
  *
  * @param Pattern
  * @desc Pattern to match for the filename

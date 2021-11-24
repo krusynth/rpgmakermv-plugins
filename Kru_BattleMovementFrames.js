@@ -5,7 +5,7 @@
 /*:
  * @plugindesc Adds movement frames to battle enemies. A *much* simpler version
  * of Yanfly's AnimatedSVEnemies.
- * @author Krues8dr
+ * @author Krusynth
  *
  * @help
  * This plugin allows for very simple multiframe animations of enemies. Create

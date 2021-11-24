@@ -5,7 +5,7 @@
 /*:
  * @plugindesc v1.0.0 Merges maps if conditions are met.
  *
- * @author Krues8dr
+ * @author Krusynth
  *
  * @help
  * ============================================================================

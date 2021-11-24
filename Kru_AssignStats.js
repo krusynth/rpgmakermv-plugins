@@ -5,7 +5,7 @@
 /*:
  * @plugindesc v1.0.1 Allow players to assign stat points.
  *
- * @author Krues8dr
+ * @author Krusynth
  *
  * @help
  * ============================================================================

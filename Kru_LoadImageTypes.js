@@ -4,7 +4,7 @@
 
 /*:
  * @plugindesc Enables loading image files other than pngs in most use cases.
- * @author Krues8dr
+ * @author Krusynth
  *
  * @help If you include a file extension, that file will be used. If not, ".png"
  * is added per usual.

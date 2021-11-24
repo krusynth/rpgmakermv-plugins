@@ -5,7 +5,7 @@
 /*:
  * @plugindesc v1.0.0 Allows for class change on level up and stat increases.
  *
- * @author Krues8dr
+ * @author Krusynth
  *
  * @help
  * ============================================================================

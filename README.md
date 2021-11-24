@@ -51,12 +51,12 @@ A system for keeping track of the reputation of your party across multiple
 groups or factions. Allows you to have named values for different reputation
 values (e.g. "Known", "Famous", etc.). Works with builtin variables for ease of
 use. Also allows discounts at shops based on your reputation. You can even have
-special graphics for each group or faction. *Requires Kru Core.* [documentation](https://github.com/krues8dr/rpgmakermv-plugins/wiki/Kru_Reputation) | [demo](https://games.krues8dr.com/demo/Kru_Reputation/)
+special graphics for each group or faction. *Requires Kru Core.* [documentation](https://github.com/krusynth/rpgmakermv-plugins/wiki/Kru_Reputation) | [demo](https://games.billhunt.dev/demo/Kru_Reputation/)
 
 ## [Game Seed](Kru_GameSeed.js)
 Creates a custom "seed" number that can be used to create pseudo-random events
 that persist across the length of a game. E.g., one of several paths is blocked
-by debris, but the path changes each game. [documentation](https://github.com/krues8dr/rpgmakermv-plugins/wiki/Kru_GameSeed) | [demo](https://games.krues8dr.com/demo/Kru_GameSeed/)
+by debris, but the path changes each game. [documentation](https://github.com/krusynth/rpgmakermv-plugins/wiki/Kru_GameSeed) | [demo](https://games.billhunt.dev/demo/Kru_GameSeed/)
 
 ## [Skill Tree](Kru_SkillTree.js)
 *work in progress*
@@ -82,7 +82,7 @@ only checks on level up or when assinging stats with the Assign Stats plugin.
 This plugin makes it easier to deploy multiple games on a single webserver, by
 allowing each instance to share the core game assets. It also allows you to
 specify a custom html container element for the game to load in, so that you
-can create a wrapper frame around the game. [demo](https://games.krues8dr.com/demo/Kru_Reputation/)
+can create a wrapper frame around the game. [demo](https://games.billhunt.dev/demo/Kru_Reputation/)
 
 ## [Load Image Types](Kru_LoadImageTypes.js)
 This plugin allows for image types other than PNGs to be loaded for most uses.

@@ -5,7 +5,7 @@
 /*:
  * @plugindesc Skill Tree system
  *
- * @author Krues8dr
+ * @author Krusynth
  *
  * @help
  * ============================================================================

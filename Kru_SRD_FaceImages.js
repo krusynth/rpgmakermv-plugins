@@ -4,7 +4,7 @@
 
 /*:
  * @plugindesc Overrides the bust images of the SRC menu plugin.
- * @author Krues8dr
+ * @author Krusynth
  *
  * @help Defaults to img/faces/filename
  */

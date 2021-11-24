@@ -1,11 +1,11 @@
 //=============================================================================
-// Krues8dr Skill Core
+// Krusynth Skill Core
 // Version: 1.0.0
 //=============================================================================
 /*:
- * @plugindesc Shared base for Krues8dr skill-related plugins
+ * @plugindesc Shared base for Krusynth skill-related plugins
  *
- * @author Krues8dr
+ * @author Krusynth
  *
  * @param ---General---
  * @default
@@ -15,7 +15,7 @@
  * Information
  * ============================================================================
  *
- * This is the base include for many Krues8dr RPG Maker MV skill plugins. It
+ * This is the base include for many Krusynth RPG Maker MV skill plugins. It
  * extends the core engine for better skill cost calculations. Skills can now
  * have an HP cost as well.
  */

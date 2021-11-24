@@ -3,7 +3,7 @@
  *
  * @plugindesc 1.0 Allows for events that are bigger than 1 tile.
  *
- * @author Krues8dr (krues8dr.com)
+ * @author Krusynth
  *
  * @help
  * This plugin allows for events that are bigger than one tiles, by

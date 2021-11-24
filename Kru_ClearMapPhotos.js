@@ -3,7 +3,7 @@
  *
  * @plugindesc 1.0 Clear Map Photos - Remove photos from the map on load.
  *
- * @author Krues8dr (krues8dr.com)
+ * @author Krusynth
  *
  * @help
  * This plugin automatically clears all previously-loaded pictures when a map is

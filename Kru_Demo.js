@@ -1,11 +1,11 @@
 //=============================================================================
-// Krues8dr Demo
+// Krusynth Demo
 // Version: 1.0.0
 //=============================================================================
 /*:
  * @plugindesc 1.0.0 Helper for demos of plugins.
  *
- * @author Krues8dr
+ * @author Krusynth
  *
  * @param Path
  * @desc Path for images and audio files.
@@ -20,7 +20,7 @@
  * Information
  * ============================================================================
  *
- * This is the base include for many Krues8dr RPG Maker MV plugins. It includes
+ * This is the base include for many Krusynth RPG Maker MV plugins. It includes
  * a JSON loader and window manager.
  */
 

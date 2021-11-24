@@ -4,7 +4,7 @@
 
 /*:
  * @plugindesc Swaps parties on map change.
- * @author Krues8dr
+ * @author Krusynth
  *
  * @help This plugin extends Hime's Party Manager to automatically swap parties
  * on map load.  Simply add a Note to the map such as <party:2> and that party
